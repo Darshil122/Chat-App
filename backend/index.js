@@ -5,7 +5,6 @@ const socketIO = require("socket.io");
 const cors = require("cors");
 const dotenv = require("dotenv");
 
-const Message = require("./models/Message");
 
 dotenv.config();
 const app = express();
@@ -27,22 +26,22 @@ mongoose
   .catch((err) => console.error(err));
 
 //socket.io
-io.on("connection", async (socket) => {
+// io.on("connection", async (socket) => {
 
-  //old Message
-  const oldMessage = await Message.find().sort({ time: 1 }).limit(20);
-  socket.emit("old-message", oldMessage);
+//   //old Message
+//   const oldMessage = await Message.find().sort({ time: 1 }).limit(20);
+//   socket.emit("old-message", oldMessage);
 
-  //receive new message
-  socket.on("user-msg", async (data) => {
-    const newMsg = new Message(data);
-    await newMsg.save();
-    io.emit("message", data);
-  });
+//   //receive new message
+//   socket.on("user-msg", async (data) => {
+//     const newMsg = new Message(data);
+//     await newMsg.save();
+//     io.emit("message", data);
+//   });
+// });
+
+app.get("/", (req, res)=>{
+  res.send("i am from backend");
 });
 
-app.get("/api", (req, res)=>{
-  res.send("i am from api");
-});
-
-server.listen(8000, () => console.log("server Start"));
+server.listen(8080, () => console.log("server Start"));
