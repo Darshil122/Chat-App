@@ -4,7 +4,7 @@ const http = require("http");
 const socketIO = require("socket.io");
 const cors = require("cors");
 const dotenv = require("dotenv");
-
+const authRouter = require("./routes/AuthRouter");
 
 dotenv.config();
 const app = express();
@@ -43,5 +43,7 @@ mongoose
 app.get("/", (req, res)=>{
   res.send("i am from backend");
 });
+
+app.use("/auth", authRouter);
 
 server.listen(8080, () => console.log("server Start"));
