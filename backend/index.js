@@ -1,20 +1,19 @@
 const express = require("express");
 const mongoose = require("mongoose");
-const http = require("http");
-const socketIO = require("socket.io");
+// const http = require("http");
+// const socketIO = require("socket.io");
 const cors = require("cors");
 const dotenv = require("dotenv");
-const authRouter = require("./routes/AuthRouter");
 
 dotenv.config();
 const app = express();
-const server = http.createServer(app);
-const io = socketIO(server, {
-  cors: {
-    origin: "http://localhost:5173",
-    methods: ["GET", "POST"],
-  },
-});
+// const server = http.createServer(app);
+// const io = socketIO(server, {
+//   cors: {
+//     origin: "http://localhost:5173",
+//     methods: ["GET", "POST"],
+//   },
+// });
 
 app.use(cors());
 app.use(express.json());
@@ -44,6 +43,7 @@ app.get("/", (req, res)=>{
   res.send("i am from backend");
 });
 
-app.use("/auth", authRouter);
+app.use("/auth", require("./routes/AuthRouter"));
+app.use('/api', require("./routes/AuthRouter"));
 
-server.listen(8080, () => console.log("server Start"));
+app.listen(8000, () => console.log("server Start"));

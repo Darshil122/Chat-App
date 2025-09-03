@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useGoogleLogin } from "@react-oauth/google";
+import { googleAuth } from "../Api";
+import axios from "axios";
 
 const Home = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -13,12 +15,18 @@ const Home = () => {
 
   const responseGoogle = async (authResult) => {
     try {
-      if(authResult['code']){
-        
+      if (authResult.code) {
+        const result = await googleAuth(authResult.code);
+        const { email, name, picture } = result.data.user;
+        console.log("Google User:", result.data.user);
+      } else {
+        console.log("No code returned:", authResult);
       }
-      console.log(authResult);
     } catch (err) {
-      console.error("error while req google", err);
+      console.error(
+        "Google request failed:",
+        err.response?.data || err.message
+      );
     }
   };
 
@@ -28,8 +36,19 @@ const Home = () => {
     flow: "auth-code",
   });
 
-  const formSubmit = (data) => {
-    console.log(data);
+  const formSubmit = async (data) => {
+    // console.log(data);
+    try{
+      if(isLogin){
+        const res = await axios.post("http://localhost:8000/api/login", data);
+        console.log("Login Success", res.data);
+      }else{
+        const res = await axios.post("http://localhost:8000/api/signup", data);
+        console.log("Sign Up Success", res.data);
+      }
+    }catch(err){
+      console.error("auth error: ", err)
+    }
   };
   return (
     <div className="bg-gray-100 min-h-screen flex flex-col items-center justify-center px-4">
