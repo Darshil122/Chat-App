@@ -3,6 +3,7 @@ import { useForm } from "react-hook-form";
 import { useGoogleLogin } from "@react-oauth/google";
 import { googleAuth } from "../Api";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 const Home = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -13,12 +14,15 @@ const Home = () => {
     formState: { errors },
   } = useForm();
 
+  const navigate = useNavigate();
+
   const responseGoogle = async (authResult) => {
     try {
       if (authResult.code) {
         const result = await googleAuth(authResult.code);
         const { email, name, picture } = result.data.user;
-        console.log("Google User:", result.data.user);
+        // console.log("Google User:", result.data.user);
+        navigate("/chat");
       } else {
         console.log("No code returned:", authResult);
       }
@@ -42,10 +46,12 @@ const Home = () => {
       if(isLogin){
         const res = await axios.post("http://localhost:8000/api/login", data);
         console.log("Login Success", res.data);
+        navigate("/chat");
       }else{
         const res = await axios.post("http://localhost:8000/api/signup", data);
         console.log("Sign Up Success", res.data);
       }
+      reset();
     }catch(err){
       console.error("auth error: ", err)
     }

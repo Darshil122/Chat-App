@@ -6,15 +6,13 @@ const bcrypt = require("bcrypt");
 
 const googleLogin = async (req, res) => {
   try {
-    // Read code from body (not query)
     const { code } = req.body;
-    console.log("code from frontend", code);
+    // console.log("code from frontend", code);
 
     // Exchange code for tokens
     const googleRes = await oauth2client.getToken(code);
     oauth2client.setCredentials(googleRes.tokens);
 
-    // Fetch user info
     const userRes = await axios.get(
       `https://www.googleapis.com/oauth2/v1/userinfo?alt=json&access_token=${googleRes.tokens.access_token}`
     );
@@ -28,10 +26,10 @@ const googleLogin = async (req, res) => {
         name,
         email,
         pic: picture,
+        loginType: "google"
       });
     }
 
-    // Generate JWT
     const token = jwt.sign({ _id: user._id, email }, process.env.JWT_SECRET, {
       expiresIn: process.env.JWT_TIMEOUT,
     });
@@ -50,13 +48,13 @@ const googleLogin = async (req, res) => {
 };
 
 async function userSignUp(req, res) {
-  const { name, email, password } = req.body;
+  const { name, email, password, loginType } = req.body;
   // console.log("req body data", req.body);
   let user = await User.findOne({ email });
   if (user) return res.status(400).json({ message: "user already exists" });
 
   const hashPassword = await bcrypt.hash(password, 10);
-  user = new User({ name, email, password: hashPassword });
+  user = new User({ name, email, password: hashPassword, loginType: "manual" });
   await user.save();
 
   const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
