@@ -30,14 +30,14 @@ const googleLogin = async (req, res) => {
       });
     }
 
-    const token = jwt.sign({ _id: user._id, email }, process.env.JWT_SECRET, {
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
       expiresIn: process.env.JWT_TIMEOUT,
     });
 
-    return res.status(200).json({
-      message: "success",
-      token,
+    res.status(200).json({
+      message: "User login Successfully",
       user,
+      token
     });
   } catch (err) {
     console.error("Google Login Error:", err.response?.data || err.message);
@@ -71,7 +71,7 @@ async function userSignIn(req, res) {
   if (!user) return res.status(400).json({ message: "User not found" });
 
   const isMatch = await bcrypt.compare(password, user.password);
-  if (!isMatch) return res.status(400).json({ message: "Invalid credentials" });
+  if (!isMatch) return res.status(400).json({ message: "password does not match" });
 
   const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
     expiresIn: "1d",

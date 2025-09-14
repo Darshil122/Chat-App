@@ -23,6 +23,9 @@ const Home = () => {
       if (authResult.code) {
         const result = await googleAuth(authResult.code);
         const { email, name, picture } = result.data.user;
+        const {token} = result.data;
+        jsonWebToken(token)
+        console.log(token);
         // console.log("Google User:", result.data.user);
         navigate("/chat");
       } else {
@@ -68,7 +71,6 @@ const Home = () => {
           );
 
           const uploadData = await uploadRes.json();
-          // console.log("Cloudinary Upload Response:", uploadData);
 
           if (uploadData.error) {
             throw new Error(uploadData.error.message);
@@ -98,16 +100,19 @@ const Home = () => {
 
       alert(res.data.message);
       const Usertoken = res.data.token;
-      localStorage.setItem("token", Usertoken);
+      jsonWebToken(Usertoken);
       reset();
       navigate("/chat");
     } catch (err) {
       console.error("auth error: ", err);
-      alert(err.message || "Something went wrong.");
     } finally {
       setLoading(false);
     }
   };
+
+  const jsonWebToken = (token) => {
+    localStorage.setItem("token", token);
+  }
 
   return (
     <div className="bg-gray-100 min-h-screen flex flex-col items-center justify-center px-4">

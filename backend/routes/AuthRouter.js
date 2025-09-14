@@ -14,7 +14,7 @@ router.get("/test", (req, res) => {
 
 router.post("/signup", userSignUp);
 router.post("/login", userSignIn);
-router.get("/me", authenticateToken, getUserFromToken);
 router.post("/google", googleLogin);
+router.get("/me", authenticateToken, getUserFromToken);
 
 module.exports = router;
