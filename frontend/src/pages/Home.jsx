@@ -7,6 +7,8 @@ import { useNavigate } from "react-router-dom";
 
 const Home = () => {
   const [isLogin, setIsLogin] = useState(true);
+  const [image, setImage] = useState(null);
+  const [loading, setLoading] = useState(false);
   const {
     register,
     handleSubmit,
@@ -41,21 +43,72 @@ const Home = () => {
   });
 
   const formSubmit = async (data) => {
-    // console.log(data);
-    try{
-      if(isLogin){
-        const res = await axios.post("http://localhost:8000/api/login", data);
-        console.log("Login Success", res.data);
-        navigate("/chat");
-      }else{
-        const res = await axios.post("http://localhost:8000/api/signup", data);
-        console.log("Sign Up Success", res.data);
+    setLoading(true);
+    let imageUrl = "";
+
+    try {
+      if (!isLogin) {
+        if (!image) {
+          alert("Please select an image!");
+          setLoading(false);
+          return;
+        }
+
+        if (image.type === "image/jpeg" || image.type === "image/png") {
+          const formData = new FormData();
+          formData.append("file", image);
+          formData.append("upload_preset", "chat-app");
+
+          const uploadRes = await fetch(
+            "https://api.cloudinary.com/v1_1/dkgvimtjm/image/upload",
+            {
+              method: "POST",
+              body: formData,
+            }
+          );
+
+          const uploadData = await uploadRes.json();
+          // console.log("Cloudinary Upload Response:", uploadData);
+
+          if (uploadData.error) {
+            throw new Error(uploadData.error.message);
+          }
+
+          imageUrl = uploadData.secure_url;
+        } else {
+          alert("Please select a proper type of image (JPEG/PNG)");
+          setLoading(false);
+          return;
+        }
       }
+
+      const payload = {
+        ...data,
+        pic: imageUrl,
+      };
+
+      // console.log("User Data", payload);
+
+      let res;
+      if (isLogin) {
+        res = await axios.post("http://localhost:8000/api/login", payload);
+      } else {
+        res = await axios.post("http://localhost:8000/api/signup", payload);
+      }
+
+      alert(res.data.message);
+      const Usertoken = res.data.token;
+      localStorage.setItem("token", Usertoken);
       reset();
-    }catch(err){
-      console.error("auth error: ", err)
+      navigate("/chat");
+    } catch (err) {
+      console.error("auth error: ", err);
+      alert(err.message || "Something went wrong.");
+    } finally {
+      setLoading(false);
     }
   };
+
   return (
     <div className="bg-gray-100 min-h-screen flex flex-col items-center justify-center px-4">
       <div className="bg-white p-7 rounded-md shadow-md w-full max-w-sm">
@@ -95,6 +148,7 @@ const Home = () => {
                 placeholder="Enter Name"
                 id="name"
                 className="w-full border border-gray-300 p-2 focus:outline-none focus:ring-1 focus:ring-blue-500 rounded-md"
+                autoComplete="name"
                 {...register("name", { required: "name is required" })}
               />
               {errors.name && (
@@ -149,10 +203,16 @@ const Home = () => {
                 type="file"
                 id="pic"
                 className="w-full border border-gray-300 p-2 focus:outline-none focus:ring-1 focus:ring-blue-500 rounded-md"
+                onChange={(e) => setImage(e.target.files[0])}
               />
             </div>
           )}
-          <button className="w-full font-bold text-xl bg-blue-500 hover:bg-blue-400 p-1.5 rounded-md">
+          <button
+            className={`w-full font-bold text-xl bg-blue-500 hover:bg-blue-400 p-1.5 rounded-md ${
+              loading ? "opacity-50 cursor-not-allowed" : ""
+            }`}
+            disabled={loading}
+          >
             {isLogin ? "Sign In" : "Sign Up"}
           </button>
         </form>

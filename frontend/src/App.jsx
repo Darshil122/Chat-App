@@ -1,8 +1,10 @@
 import { Route, Routes } from "react-router-dom";
+import { GoogleOAuthProvider } from "@react-oauth/google";
+import Navbar from "./components/Navbar";
 import Home from "./pages/Home";
 import Chat from "./pages/Chat";
 import PageNotFound from "./pages/PageNotFound";
-import { GoogleOAuthProvider } from "@react-oauth/google";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 const GoogleAuthWrapper = () => {
   return (
@@ -10,14 +12,22 @@ const GoogleAuthWrapper = () => {
       <Home />
     </GoogleOAuthProvider>
   );
-}
+};
 
 function App() {
   return (
     <Routes>
       <Route path="/" element={<GoogleAuthWrapper />} />
-      <Route path="/chat" element={<Chat />} />
-      <Route path="*" element={<PageNotFound/>}/>
+      <Route
+        path="/chat"
+        element={
+          <ProtectedRoute>
+            <Navbar />
+            <Chat />
+          </ProtectedRoute>
+        }
+      />
+      <Route path="*" element={<PageNotFound />} />
     </Routes>
   );
 }

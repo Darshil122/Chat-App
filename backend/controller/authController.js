@@ -48,20 +48,20 @@ const googleLogin = async (req, res) => {
 };
 
 async function userSignUp(req, res) {
-  const { name, email, password, loginType } = req.body;
+  const { name, email, password, pic} = req.body;
   // console.log("req body data", req.body);
   let user = await User.findOne({ email });
   if (user) return res.status(400).json({ message: "user already exists" });
 
   const hashPassword = await bcrypt.hash(password, 10);
-  user = new User({ name, email, password: hashPassword, loginType: "manual" });
+  user = new User({ name, email, password: hashPassword, pic, loginType: "manual" });
   await user.save();
 
   const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
     expiresIn: "1d",
   });
 
-  res.status(200).json({ message: "user Create Successfully", user, token });
+  res.status(200).json({ message: "user Create Successfully", token });
 }
 
 async function userSignIn(req, res) {
@@ -77,7 +77,14 @@ async function userSignIn(req, res) {
     expiresIn: "1d",
   });
 
-  res.status(200).json({ message: "user Login Successfully", user, token });
+  res.status(200).json({ message: "user Login Successfully", token });
 }
 
-module.exports = { googleLogin, userSignIn, userSignUp };
+async function getUserFromToken(req, res){
+  const user = await User.findById(req.user.id).select("-password");
+  if(!user) return res.status(404).json({message: "User not found"});
+
+  res.json({user});
+}
+
+module.exports = { googleLogin, userSignIn, userSignUp, getUserFromToken };
