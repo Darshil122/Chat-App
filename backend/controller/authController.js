@@ -26,7 +26,7 @@ const googleLogin = async (req, res) => {
         name,
         email,
         pic: picture,
-        loginType: "google"
+        loginType: "google",
       });
     }
 
@@ -37,7 +37,7 @@ const googleLogin = async (req, res) => {
     res.status(200).json({
       message: "User login Successfully",
       user,
-      token
+      token,
     });
   } catch (err) {
     console.error("Google Login Error:", err.response?.data || err.message);
@@ -48,13 +48,19 @@ const googleLogin = async (req, res) => {
 };
 
 async function userSignUp(req, res) {
-  const { name, email, password, pic} = req.body;
+  const { name, email, password, pic } = req.body;
   // console.log("req body data", req.body);
   let user = await User.findOne({ email });
   if (user) return res.status(400).json({ message: "user already exists" });
 
   const hashPassword = await bcrypt.hash(password, 10);
-  user = new User({ name, email, password: hashPassword, pic, loginType: "manual" });
+  user = new User({
+    name,
+    email,
+    password: hashPassword,
+    pic,
+    loginType: "manual",
+  });
   await user.save();
 
   const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
@@ -66,12 +72,13 @@ async function userSignUp(req, res) {
 
 async function userSignIn(req, res) {
   const { email, password } = req.body;
-  
+
   let user = await User.findOne({ email });
   if (!user) return res.status(400).json({ message: "User not found" });
 
   const isMatch = await bcrypt.compare(password, user.password);
-  if (!isMatch) return res.status(400).json({ message: "password does not match" });
+  if (!isMatch)
+    return res.status(400).json({ message: "password does not match" });
 
   const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
     expiresIn: "1d",
@@ -80,11 +87,32 @@ async function userSignIn(req, res) {
   res.status(200).json({ message: "user Login Successfully", token });
 }
 
-async function getUserFromToken(req, res){
+async function getUserFromToken(req, res) {
   const user = await User.findById(req.user.id).select("-password");
-  if(!user) return res.status(404).json({message: "User not found"});
+  if (!user) return res.status(404).json({ message: "User not found" });
 
-  res.json({user});
+  res.json({ user });
 }
 
-module.exports = { googleLogin, userSignIn, userSignUp, getUserFromToken };
+async function allUsers(req, res) {
+  const keyword = req.query.search
+    ? {
+        $or: [
+          { name: { $regex: req.query.search, $options: "i" } },
+          { email: { $regex: req.query.search, $options: "i" } },
+        ],
+      }
+    : {};
+
+  const users = await User.find(keyword).find({ _id: { $ne: req.user._id } });
+
+  res.status(200).json(users);
+}
+
+module.exports = {
+  googleLogin,
+  userSignIn,
+  userSignUp,
+  getUserFromToken,
+  allUsers,
+};
