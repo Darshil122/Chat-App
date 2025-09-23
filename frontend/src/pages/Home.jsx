@@ -22,11 +22,8 @@ const Home = () => {
     try {
       if (authResult.code) {
         const result = await googleAuth(authResult.code);
-        const { email, name, picture } = result.data.user;
         const {token} = result.data;
-        jsonWebToken(token)
-        console.log(token);
-        // console.log("Google User:", result.data.user);
+        jsonWebToken(token);
         navigate("/chat");
       } else {
         console.log("No code returned:", authResult);
@@ -43,6 +40,7 @@ const Home = () => {
     onSuccess: responseGoogle,
     onError: responseGoogle,
     flow: "auth-code",
+    // ux_mode : "popup",
   });
 
   const formSubmit = async (data) => {
@@ -100,6 +98,7 @@ const Home = () => {
 
       alert(res.data.message);
       const Usertoken = res.data.token;
+      // console.log(Usertoken);
       jsonWebToken(Usertoken);
       reset();
       navigate("/chat");

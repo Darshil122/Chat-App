@@ -1,5 +1,6 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 
 const Navbar = () => {
   const [user, setUser] = useState(null);
@@ -24,9 +25,25 @@ const Navbar = () => {
   }, [token]);
 
   return (
-    <nav className="bg-emerald-200 p-4 flex justify-between">
+    <nav className="bg-emerald-200 p-4 flex justify-between items-center">
       <div className="text-xl font-bold">Chat App</div>
-      {user ? <h1>{user.name}</h1> : <h1>Guest</h1>}
+
+      <div className="flex items-center gap-4">
+        <span className="font-medium">
+          {user ? user.name : "Guest"}
+        </span>
+
+        {token && (
+          <>
+            <Link to="/profile" className="font-medium">
+              Profile
+            </Link>
+            <Link to="/logout" className="font-medium">
+              Logout
+            </Link>
+          </>
+        )}
+      </div>
     </nav>
   );
 };

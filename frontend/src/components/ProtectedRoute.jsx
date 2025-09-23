@@ -1,10 +1,10 @@
-import React from 'react'
-import { Link,  } from 'react-router-dom';
+import React from "react";
+import { Navigate } from "react-router-dom";
 
-const ProtectedRoute = ({children}) => {
-    const token = localStorage.getItem("token");
+const ProtectedRoute = ({ children }) => {
+  const token = localStorage.getItem("token");
 
-  return token ? children : <Link to="/" />;
-}
+  return token ? children : <Navigate to="/" replace />;
+};
 
 export default ProtectedRoute;
