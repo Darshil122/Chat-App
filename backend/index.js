@@ -4,7 +4,6 @@ const mongoose = require("mongoose");
 // const socketIO = require("socket.io");
 const cors = require("cors");
 const dotenv = require("dotenv");
-const {chatRoutes} = require("./routes/ChatRouter");
 
 dotenv.config();
 const app = express();
@@ -46,6 +45,6 @@ app.get("/", (req, res)=>{
 
 app.use("/auth", require("./routes/AuthRouter"));
 app.use('/api', require("./routes/AuthRouter"));
-app.use("/api/chat", chatRoutes);
+app.use("/api/chat", require("./routes/ChatRouter"));
 
 app.listen(8000, () => console.log("server Start"));
