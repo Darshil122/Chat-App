@@ -1,10 +1,13 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import logo from '../assets/2.png';
+import logo from "../assets/logo.png";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faBars, faTimes } from "@fortawesome/free-solid-svg-icons";
 
 const Navbar = () => {
   const [user, setUser] = useState(null);
+  const [menuOpen, setMenuOpen] = useState(false);
   const token = localStorage.getItem("token");
 
   useEffect(() => {
@@ -26,23 +29,35 @@ const Navbar = () => {
   }, [token]);
 
   return (
-    <nav className="bg-emerald-200 p-4 flex justify-between items-center">
-      <div className="text-xl font-bold">
-        <img src={logo} alt="Logo" className="h-10 w-34" />
+    <nav className="bg-green-300 px-4 py-2 shadow-md">
+      <div className="flex justify-between items-center">
+
+        <img src={logo} alt="Logo" className="h-14 w-auto" />
+
+        <button
+          className="lg:hidden text-gray-700 text-xl"
+          onClick={() => setMenuOpen(!menuOpen)}
+        >
+          <FontAwesomeIcon icon={menuOpen ? faTimes : faBars} />
+        </button>
+
+        <div className="hidden lg:flex items-center gap-4">
+          <span className="font-medium">{user ? user.name : "Guest"}</span>
+          <Link to="/logout" className="font-medium">
+            Logout
+          </Link>
+        </div>
       </div>
 
-      <div className="flex items-center gap-4">
-        <input
-          type="text"
-          placeholder="Search..."
-          className="px-2 py-1 border rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 focus:bg-white"
-        />
-        <span className="font-medium">{user ? user.name : "Guest"}</span>
-
-        <Link to="/logout" className="font-medium">
-          Logout
-        </Link>
-      </div>
+      {/* Mobile menu */}
+      {menuOpen && (
+        <div className="mt-4 lg:hidden flex flex-col gap-3">
+          <span className="font-medium">{user ? user.name : "Guest"}</span>
+          <Link to="/logout" className="font-medium">
+            Logout
+          </Link>
+        </div>
+      )}
     </nav>
   );
 };
