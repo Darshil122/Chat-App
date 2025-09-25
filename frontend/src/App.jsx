@@ -7,14 +7,6 @@ import PageNotFound from "./pages/PageNotFound";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Logout from "./components/Logout";
 
-// const GoogleAuthWrapper = () => {
-//   return (
-//     <GoogleOAuthProvider clientId="555837498610-ppfvgp594tvisucv32pb770hhseladka.apps.googleusercontent.com">
-//       <Home />
-//     </GoogleOAuthProvider>
-//   );
-// };
-
 function App() {
   return (
     <GoogleOAuthProvider clientId="555837498610-ppfvgp594tvisucv32pb770hhseladka.apps.googleusercontent.com">
