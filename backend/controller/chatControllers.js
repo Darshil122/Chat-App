@@ -32,7 +32,8 @@ const accessChat = async (req, res) => {
         isGroupChat: false,
         users: [req.user._id, userId],
       };
-
+      
+      // console.log("Creating chat with users:", chatData);
       const createdChat = await Chat.create(chatData);
 
       const fullChat = await Chat.findOne({ _id: createdChat._id }).populate(
