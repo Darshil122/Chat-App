@@ -35,12 +35,12 @@ const googleLogin = async (req, res) => {
     });
 
     res.status(200).json({
-      message: "User login Successfully",
+      message: "User Logged In Successfully",
       user,
       token,
     });
   } catch (err) {
-    console.error("Google Login Error:", err.response?.data || err.message);
+    // console.error("Google Login Error:", err.response?.data || err.message);
     res.status(500).json({
       message: "internal server error",
     });
@@ -49,16 +49,17 @@ const googleLogin = async (req, res) => {
 
 async function userSignUp(req, res) {
   const { name, email, password, pic } = req.body;
-  // console.log("req body data", req.body);
   let user = await User.findOne({ email });
-  if (user) return res.status(400).json({ message: "user already exists" });
+  if (user) return res.status(400).json({ message: "User already exists" });
 
   const hashPassword = await bcrypt.hash(password, 10);
   user = new User({
     name,
     email,
     password: hashPassword,
-    pic,
+    pic:
+      pic ||
+      "https://static.vecteezy.com/system/resources/previews/009/292/244/non_2x/default-avatar-icon-of-social-media-user-vector.jpg",
     loginType: "manual",
   });
   await user.save();
@@ -67,7 +68,7 @@ async function userSignUp(req, res) {
     expiresIn: "1d",
   });
 
-  res.status(200).json({ message: "user Create Successfully", token });
+  res.status(200).json({ message: "User Create Successfully", token });
 }
 
 async function userSignIn(req, res) {
@@ -78,13 +79,13 @@ async function userSignIn(req, res) {
 
   const isMatch = await bcrypt.compare(password, user.password);
   if (!isMatch)
-    return res.status(400).json({ message: "password does not match" });
+    return res.status(400).json({ message: "Password does not match" });
 
   const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
     expiresIn: "1d",
   });
 
-  res.status(200).json({ message: "user Login Successfully", token });
+  res.status(200).json({ message: "Logged In Successfully", token });
 }
 
 async function getUserFromToken(req, res) {

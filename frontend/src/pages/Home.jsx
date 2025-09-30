@@ -4,6 +4,7 @@ import { useGoogleLogin } from "@react-oauth/google";
 import { googleAuth } from "../Api";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-hot-toast";
 
 const Home = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -22,7 +23,7 @@ const Home = () => {
     try {
       if (authResult.code) {
         const result = await googleAuth(authResult.code);
-        const {token} = result.data;
+        const { token } = result.data;
         jsonWebToken(token);
         navigate("/chat");
       } else {
@@ -48,13 +49,7 @@ const Home = () => {
     let imageUrl = "";
 
     try {
-      if (!isLogin) {
-        if (!image) {
-          alert("Please select an image!");
-          setLoading(false);
-          return;
-        }
-
+      if (!isLogin && image) {
         if (image.type === "image/jpeg" || image.type === "image/png") {
           const formData = new FormData();
           formData.append("file", image);
@@ -76,16 +71,23 @@ const Home = () => {
 
           imageUrl = uploadData.secure_url;
         } else {
-          alert("Please select a proper type of image (JPEG/PNG)");
+          toast("Please select a proper type of image (JPEG/PNG)", {
+            icon: "⚠️",
+            style: {
+              borderRadius: "9px",
+              background: "#fff",
+              color: "#e68a00",
+            },
+          });
+
           setLoading(false);
           return;
         }
       }
 
-      const payload = {
-        ...data,
-        pic: imageUrl,
-      };
+      const payload = isLogin
+        ? { email: data.email, password: data.password }
+        : { ...data, pic: imageUrl };
 
       // console.log("User Data", payload);
 
@@ -96,14 +98,18 @@ const Home = () => {
         res = await axios.post("http://localhost:8000/api/signup", payload);
       }
 
-      alert(res.data.message);
+      toast.success(res.data.message);
+
+      // console.log("message", res.data.message);
       const Usertoken = res.data.token;
-      // console.log(Usertoken);
       jsonWebToken(Usertoken);
       reset();
       navigate("/chat");
     } catch (err) {
-      console.error("auth error: ", err);
+      const message =
+        err.response?.data?.message ||
+        "Something went wrong during authentication";
+      toast.error(message);
     } finally {
       setLoading(false);
     }
@@ -111,7 +117,7 @@ const Home = () => {
 
   const jsonWebToken = (token) => {
     localStorage.setItem("token", token);
-  }
+  };
 
   return (
     <div className="bg-gray-100 min-h-screen flex flex-col items-center justify-center px-4">
@@ -168,6 +174,8 @@ const Home = () => {
               type="email"
               placeholder="Enter email"
               id="email"
+              name="email"
+              autoComplete="email"
               className="w-full border border-gray-300 p-2 focus:outline-none focus:ring-1 focus:ring-blue-500 rounded-md"
               {...register("email", { required: "email is required" })}
             />

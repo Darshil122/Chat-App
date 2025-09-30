@@ -9,7 +9,7 @@ const userSchema = mongoose.Schema(
       type: String,
       required: true,
       default:
-        "https://www.vecteezy.com/vector-art/2076534-default-user-icon-vector.jpg",
+        "https://static.vecteezy.com/system/resources/previews/009/292/244/non_2x/default-avatar-icon-of-social-media-user-vector.jpg",
     },
     loginType: { type: String, enum: ["manual", "google"], default: "manual" },
   },
