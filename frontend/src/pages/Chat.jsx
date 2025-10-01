@@ -1,6 +1,7 @@
 import React, { useState } from "react";
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUserGroup, faBars } from "@fortawesome/free-solid-svg-icons";
+import { Link } from "react-router-dom";
 
 const Chat = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -41,10 +42,23 @@ const Chat = () => {
                 className="w-full px-3 py-2 rounded-md bg-white dark:bg-gray-700 text-white placeholder:text-gray-300 border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </li>
-            <li className="flex items-center px-4 py-2 dark:text-white rounded-lg  dark:hover:bg-gray-700 transition">
-              <span className="ml-3">Dashboard</span>
-            </li>
-            {/* Add more items as needed */}
+            <Link
+            to="/chat/12"
+              className="flex items-center gap-3 px-4 py-2 rounded-lg transition-colors cursor-pointer 
+               hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-800 dark:text-white"
+            >
+              
+                <img
+                  src="https://cdn.pixabay.com/photo/2023/12/04/17/16/woman-8429860_1280.jpg"
+                  alt="User avatar"
+                  className="w-10 h-10 rounded-full object-cover"
+                />
+                <div className="flex flex-col">
+                  <p className="font-semibold text-sm">Jane Doe</p>
+                  <span className="text-xs dark:text-gray-400">Chat</span>
+                </div>
+              
+            </Link>
           </ul>
         </div>
       </aside>
@@ -61,11 +75,6 @@ const Chat = () => {
           >
             <FontAwesomeIcon icon={faBars} />
           </button>
-
-          {/* Header Title */}
-          {/* <h1 className="text-lg font-semibold text-gray-800 dark:text-white">
-            Chat
-          </h1> */}
         </header>
 
         <main className="flex-1 p-6 overflow-auto">
