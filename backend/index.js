@@ -21,7 +21,10 @@ app.use(express.json());
 
 // connect db
 mongoose
-  .connect(process.env.MONGODB_URL)
+  .connect(process.env.MONGODB_URL, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
   .then(() => console.log("DB Connected"))
   .catch((err) => console.error(err));
 
@@ -55,7 +58,7 @@ if (process.env.NODE_ENV === "production") {
 // --- Deployment ---
 
 app.use("/auth", require("./routes/AuthRouter"));
-app.use('/api', require("./routes/AuthRouter"));
+app.use("/api", require("./routes/AuthRouter"));
 app.use("/api/chat", require("./routes/ChatRouter"));
 
 app.listen(8000, () => console.log("server Start"));
