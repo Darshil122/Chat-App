@@ -44,17 +44,25 @@ mongoose
 // });
 
 // --- Deployment ---
-__dirname = path.resolve();
-if (process.env.NODE_ENV === "production") {
-  app.use(express.static(path.join(__dirname, "../frontend/dist")));
-  app.get("*", (req, res) => {
-    res.sendFile(path.resolve(__dirname, "../frontend/dist/index.html"));
-  });
-} else {
-  app.get("/", (req, res) => {
-    res.send("API is running..");
-  });
-}
+// __dirname = path.resolve();
+// if (process.env.NODE_ENV === "production") {
+//   app.use(express.static(path.join(__dirname, "../frontend/dist")));
+//   app.get("*", (req, res) => {
+//     res.sendFile(path.resolve(__dirname, "../frontend/dist/index.html"));
+//   });
+// } else {
+//   app.get("/", (req, res) => {
+//     res.send("API is running..");
+//   });
+// }
+
+const frontendPath = path.join(__dirname, "../frontend/dist");
+app.use(express.static(frontendPath));
+
+// Catch-all: Serve React index.html for any non-API routes
+app.get("*", (req, res) => {
+  res.sendFile(path.join(frontendPath, "index.html"));
+});
 // --- Deployment ---
 
 app.use("/auth", require("./routes/AuthRouter"));
