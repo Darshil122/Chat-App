@@ -93,9 +93,9 @@ const Home = () => {
 
       let res;
       if (isLogin) {
-        res = await axios.post("http://localhost:8000/api/login", payload);
+        res = await axios.post("http://localhost:8000/auth/login", payload);
       } else {
-        res = await axios.post("http://localhost:8000/api/signup", payload);
+        res = await axios.post("http://localhost:8000/auth/signup", payload);
       }
 
       toast.success(res.data.message);
