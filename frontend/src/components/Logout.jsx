@@ -6,8 +6,7 @@ const Logout = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    localStorage.clear();
-    localStorage.removeItem("token");
+    localStorage.removeItem("userInfo");
     toast.success("User Logout Successfully");
     navigate("/", { replace: true });
   }, [navigate]);

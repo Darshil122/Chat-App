@@ -7,29 +7,30 @@ import { faCaretDown } from "@fortawesome/free-solid-svg-icons";
 // import { ChatState } from "../Context/ChatProvider";
 
 const Navbar = () => {
-  const [user, setUser] = useState(null);
+  // const [user, setUser] = useState(null);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const token = localStorage.getItem("token");
+  const user = JSON.parse(localStorage.getItem("userInfo"));
+  // console.log("user from navbar", user);
   const dropdownRef = useRef(null);
   // const { user } = ChatState();
 
-  useEffect(() => {
-    const fetchUser = async () => {
-      if (token) {
-        try {
-          const res = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/auth/me`, {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          });
-          setUser(res.data.user);
-        } catch (error) {
-          console.error("Failed to fetch user", error);
-        }
-      }
-    };
-    fetchUser();
-  }, [token]);
+  // useEffect(() => {
+  //   const fetchUser = async () => {
+  //     if (token) {
+  //       try {
+  //         const res = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/auth/me`, {
+  //           headers: {
+  //             Authorization: `Bearer ${token}`,
+  //           },
+  //         });
+  //         setUser(res.data.user);
+  //       } catch (error) {
+  //         console.error("Failed to fetch user", error);
+  //       }
+  //     }
+  //   };
+  //   fetchUser();
+  // }, [token]);
 
   useEffect(() => {
     const handleClickOutside = (e) => {

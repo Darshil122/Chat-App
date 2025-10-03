@@ -15,6 +15,7 @@ const SideBar = ({sidebarOpen, setSidebarOpen}) => {
       inputRef.current.focus();
     }
   }
+  // if(!user) return console.log("user", user);
   return (
     <>
       <div

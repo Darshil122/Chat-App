@@ -1,32 +1,16 @@
 import { createContext, useContext, useEffect, useState } from "react";
-import axios from "axios";
 
 const ChatContext = createContext();
 
 const ChatProvider = ({ children }) => {
-  const token = localStorage.getItem("token");
-  const [user, setUser] = useState();
+  const [user, setUser] = useState(null);
 
-    useEffect(() => {
-      const fetchUser = async () => {
-        if (token) {
-          try {
-            const res = await axios.get(
-              `${import.meta.env.VITE_BACKEND_URL}/auth/me`,
-              {
-                headers: {
-                  Authorization: `Bearer ${token}`,
-                },
-              }
-            );
-            setUser(res.data.user);
-          } catch (error) {
-            console.error("Failed to fetch user", error);
-          }
-        }
-      };
-      fetchUser();
-    }, [token]);
+  useEffect(() => {
+    const userInfo = JSON.parse(localStorage.getItem("userInfo"));
+    if (userInfo) {
+      setUser(userInfo);
+    }
+  }, []);
 
   return (
     <ChatContext.Provider value={{ user, setUser }}>
@@ -35,9 +19,7 @@ const ChatProvider = ({ children }) => {
   );
 };
 
-const ChatState = () => {
-  return useContext(ChatContext);
-};
+const ChatState = () => useContext(ChatContext);
 
 export { ChatState };
 export default ChatProvider;
