@@ -68,7 +68,7 @@ async function userSignUp(req, res) {
     expiresIn: "1d",
   });
 
-  res.status(200).json({ message: "User Create Successfully", token });
+  res.status(200).json({ message: "User Create Successfully", token, user });
 }
 
 async function userSignIn(req, res) {
@@ -85,7 +85,7 @@ async function userSignIn(req, res) {
     expiresIn: "1d",
   });
 
-  res.status(200).json({ message: "Logged In Successfully", token });
+  res.status(200).json({ message: "Logged In Successfully", token, user });
 }
 
 async function getUserFromToken(req, res) {
