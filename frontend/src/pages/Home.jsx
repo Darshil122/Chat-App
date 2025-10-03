@@ -93,9 +93,15 @@ const Home = () => {
 
       let res;
       if (isLogin) {
-        res = await axios.post("http://localhost:8000/auth/login", payload);
+        res = await axios.post(
+          `${import.meta.env.VITE_BACKEND_URL}/auth/login`,
+          payload
+        );
       } else {
-        res = await axios.post("http://localhost:8000/auth/signup", payload);
+        res = await axios.post(
+          `${import.meta.env.VITE_BACKEND_URL}/auth/signup`,
+          payload
+        );
       }
 
       toast.success(res.data.message);
