@@ -4,12 +4,14 @@ import { Link } from "react-router-dom";
 import logo from "../assets/logo.png";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCaretDown } from "@fortawesome/free-solid-svg-icons";
+// import { ChatState } from "../Context/ChatProvider";
 
 const Navbar = () => {
   const [user, setUser] = useState(null);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const token = localStorage.getItem("token");
   const dropdownRef = useRef(null);
+  // const { user } = ChatState();
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -50,7 +52,10 @@ const Navbar = () => {
             onClick={() => setIsDropdownOpen((prev) => !prev)}
             className="flex items-center gap-2 font-medium px-4 py-2 hover:bg-green-200 rounded cursor-pointer"
           >
-            {user ? user.name : "Guest"}
+            <img
+              src={user?.pic}
+              className="w-8 h-8 rounded-full object-cover"
+            />
             <FontAwesomeIcon icon={faCaretDown} />
           </button>
 

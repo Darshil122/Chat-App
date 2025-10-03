@@ -1,9 +1,20 @@
-import React from 'react'
+import React, { useRef } from 'react'
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faUserGroup } from "@fortawesome/free-solid-svg-icons";
+import {
+  faUserGroup,
+  faMagnifyingGlass,
+} from "@fortawesome/free-solid-svg-icons";
 import { Link } from "react-router-dom";
+import { ChatState } from '../Context/ChatProvider';
 
 const SideBar = ({sidebarOpen, setSidebarOpen}) => {
+  const { user } = ChatState();
+  const inputRef = useRef(null);
+  const handleInputClick = () => {
+    if(inputRef.current) {
+      inputRef.current.focus();
+    }
+  }
   return (
     <>
       <div
@@ -23,19 +34,26 @@ const SideBar = ({sidebarOpen, setSidebarOpen}) => {
             <li className="flex justify-end">
               <button
                 type="button"
+                title="Create New Group"
                 className="flex items-center gap-2 text-white bg-gray-500 hover:bg-gray-600 py-2 px-4 rounded-lg transition-colors duration-200"
               >
                 <FontAwesomeIcon icon={faUserGroup} />
                 <span className="font-medium">New Group</span>
               </button>
             </li>
-            <li>
+            <li className="relative w-full" title='Search User to Chat'>
               <input
+                ref={inputRef}
                 type="text"
                 placeholder="Search User..."
                 id="search"
                 name="search"
-                className="w-full px-3 py-2 rounded-md bg-white dark:bg-gray-700 text-white placeholder:text-gray-300 border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full pr-10 px-3 py-2 rounded-md bg-white dark:bg-gray-700 text-white placeholder:text-gray-300 border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+              <FontAwesomeIcon
+                onClick={handleInputClick}
+                icon={faMagnifyingGlass}
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-white cursor-text"
               />
             </li>
             <Link
@@ -44,12 +62,12 @@ const SideBar = ({sidebarOpen, setSidebarOpen}) => {
                hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-800 dark:text-white"
             >
               <img
-                src="https://cdn.pixabay.com/photo/2023/12/04/17/16/woman-8429860_1280.jpg"
-                alt="User avatar"
+                src={user?.pic}
+                alt={user?.name}
                 className="w-10 h-10 rounded-full object-cover"
               />
               <div className="flex flex-col">
-                <p className="font-semibold text-sm">Jane Doe</p>
+                <p className="font-semibold text-sm">{user?.name}</p>
                 <span className="text-xs dark:text-gray-400">Chat</span>
               </div>
             </Link>
