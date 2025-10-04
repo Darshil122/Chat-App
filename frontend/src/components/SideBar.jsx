@@ -1,21 +1,42 @@
-import React, { useRef } from 'react'
+import React, { useEffect, useRef, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faUserGroup,
   faMagnifyingGlass,
 } from "@fortawesome/free-solid-svg-icons";
 import { Link } from "react-router-dom";
-import { ChatState } from '../Context/ChatProvider';
+import { useDispatch, useSelector } from "react-redux";
+import { searchUsers, userInfo } from "../features/userSlice";
 
-const SideBar = ({sidebarOpen, setSidebarOpen}) => {
-  const { user } = ChatState();
+const SideBar = ({ sidebarOpen, setSidebarOpen }) => {
+  const {
+    userProfile: user,
+    loading,
+    searchResults,
+  } = useSelector((state) => state.user || {});
+  const [serachTerm, setSearchTerm] = useState("");
+  const dispatch = useDispatch();
   const inputRef = useRef(null);
   const handleInputClick = () => {
-    if(inputRef.current) {
+    if (inputRef.current) {
       inputRef.current.focus();
     }
-  }
-  // if(!user) return console.log("user", user);
+  };
+
+  useEffect(() => {
+    dispatch(userInfo());
+  }, [dispatch]);
+
+  const handleSearchChange = (e) => {
+    const value = e.target.value;
+    setSearchTerm(value);
+
+    if (value.trim() !== "") {
+      // console.log("search term", value);
+      dispatch(searchUsers(value));
+    }
+  };
+
   return (
     <>
       <div
@@ -42,9 +63,11 @@ const SideBar = ({sidebarOpen, setSidebarOpen}) => {
                 <span className="font-medium">New Group</span>
               </button>
             </li>
-            <li className="relative w-full" title='Search User to Chat'>
+            <li className="relative w-full" title="Search User to Chat">
               <input
                 ref={inputRef}
+                value={serachTerm}
+                onChange={handleSearchChange}
                 type="text"
                 placeholder="Search User..."
                 id="search"
@@ -57,26 +80,59 @@ const SideBar = ({sidebarOpen, setSidebarOpen}) => {
                 className="absolute right-3 top-1/2 transform -translate-y-1/2 text-white cursor-text"
               />
             </li>
-            <Link
-              to="/chat/12"
-              className="flex items-center gap-3 px-4 py-2 rounded-lg transition-colors cursor-pointer 
-               hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-800 dark:text-white"
-            >
-              <img
-                src={user?.pic}
-                alt={user?.name}
-                className="w-10 h-10 rounded-full object-cover"
-              />
-              <div className="flex flex-col">
-                <p className="font-semibold text-sm">{user?.name}</p>
-                <span className="text-xs dark:text-gray-400">Chat</span>
+            {serachTerm.trim() !== "" ? (
+              <div className="max-h-60 overflow-y-auto">
+                {loading && <p className="text-gray-500">Loading...</p>}
+                {!loading && searchResults.length === 0 && (
+                  <p className="text-gray-500">No users found.</p>
+                )}
+                {!loading && searchResults.length > 0 && (
+                  <ul>
+                    {searchResults.map((user) => (
+                      <Link
+                        to="/chat/12"
+                        key={user._id}
+                        className="flex items-center gap-3 px-3 py-2 rounded-lg transition-colors cursor-pointer 
+                      hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-800 dark:text-white"
+                      >
+                        <img
+                          src={user?.pic}
+                          alt={user?.name}
+                          className="w-12 h-12 rounded-full object-cover"
+                        />
+                        <div className="flex flex-col">
+                          <p className="font-semibold text-md">{user?.name}</p>
+                          <span className="text-sm dark:text-gray-400">
+                            Chat
+                          </span>
+                        </div>
+                      </Link>
+                    ))}
+                  </ul>
+                )}
               </div>
-            </Link>
+            ) : (
+              <Link
+                to="/chat/12"
+                className="flex items-center gap-3 px-3 py-2 rounded-lg transition-colors cursor-pointer 
+                      hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-800 dark:text-white"
+              >
+                <img
+                  src={user?.pic}
+                  alt={user?.name}
+                  className="w-12 h-12 rounded-full object-cover"
+                />
+                <div className="flex flex-col">
+                  <p className="font-semibold text-md">{user?.name}</p>
+                  <span className="text-sm dark:text-gray-400">Chat</span>
+                </div>
+              </Link>
+            )}
           </ul>
         </div>
       </aside>
     </>
   );
-}
+};
 
-export default SideBar
+export default SideBar;

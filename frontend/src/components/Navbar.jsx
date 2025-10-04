@@ -1,37 +1,22 @@
-import axios from "axios";
+// import axios from "axios";
 import React, { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import logo from "../assets/logo.png";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCaretDown } from "@fortawesome/free-solid-svg-icons";
-// import { ChatState } from "../Context/ChatProvider";
+import { useDispatch, useSelector } from "react-redux";
+import { userInfo } from "../features/userSlice";
 
 const Navbar = () => {
-  // const [user, setUser] = useState(null);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const user = JSON.parse(localStorage.getItem("userInfo"));
-  // console.log("user from navbar", user);
   const dropdownRef = useRef(null);
-  // const { user } = ChatState();
+  const dispatch = useDispatch();
+  const { userProfile: user } = useSelector((state) => state.user || {});
+  // console.log("userInfo from navbar", user);
 
-  // useEffect(() => {
-  //   const fetchUser = async () => {
-  //     if (token) {
-  //       try {
-  //         const res = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/auth/me`, {
-  //           headers: {
-  //             Authorization: `Bearer ${token}`,
-  //           },
-  //         });
-  //         setUser(res.data.user);
-  //       } catch (error) {
-  //         console.error("Failed to fetch user", error);
-  //       }
-  //     }
-  //   };
-  //   fetchUser();
-  // }, [token]);
-
+  useEffect(() => {
+    dispatch(userInfo());
+  }, [dispatch]);
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
@@ -57,6 +42,7 @@ const Navbar = () => {
               src={user?.pic}
               className="w-8 h-8 rounded-full object-cover"
             />
+
             <FontAwesomeIcon icon={faCaretDown} />
           </button>
 

@@ -2,12 +2,13 @@ import { createRoot } from "react-dom/client";
 import "./index.css";
 import App from "./App.jsx";
 import { BrowserRouter } from "react-router-dom";
-import ChatProvider from "./Context/ChatProvider";
+import { Provider } from "react-redux";
+import { store } from "./Store/store";
 
 createRoot(document.getElementById("root")).render(
-  <ChatProvider>
+  <Provider store={store}>
     <BrowserRouter>
       <App />
     </BrowserRouter>
-  </ChatProvider>
+  </Provider>
 );

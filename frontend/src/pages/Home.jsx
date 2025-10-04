@@ -23,9 +23,9 @@ const Home = () => {
     try {
       if (authResult.code) {
         const result = await googleAuth(authResult.code);
-        const { user } = result.data;
-        console.log("Google user", user);
-        jsonWebToken(user);
+        const { token } = result.data;
+        console.log("Google user", token);
+        jsonWebToken(token);
         navigate("/chat");
       } else {
         console.log("No code returned:", authResult);
@@ -108,8 +108,8 @@ const Home = () => {
       toast.success(res.data.message);
 
       // console.log("message", res.data.message);
-      const user = res.data.user;
-      jsonWebToken(user);
+      const token = res.data.token;
+      jsonWebToken(token);
       reset();
       navigate("/chat");
     } catch (err) {
@@ -122,8 +122,8 @@ const Home = () => {
     }
   };
 
-  const jsonWebToken = (user) => {
-    localStorage.setItem("userInfo", JSON.stringify(user));
+  const jsonWebToken = (token) => {
+    localStorage.setItem("token", JSON.stringify(token));
   };
 
   return (
