@@ -1,5 +1,5 @@
 const axios = require("axios");
-const User  = require("../models/userModel");
+const User = require("../models/userModel");
 const { oauth2client } = require("../utils/googleConfig");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
@@ -18,6 +18,8 @@ const googleLogin = async (req, res) => {
     );
 
     const { email, name, picture } = userRes.data;
+    const cloudinaryUrl = await uploadGooglePictureToCloudinary(picture);
+    // console.log("google user info", email, name, picture);
 
     // Check if user exists or create new
     let user = await User.findOne({ email });
@@ -25,7 +27,7 @@ const googleLogin = async (req, res) => {
       user = await User.create({
         name,
         email,
-        pic: picture,
+        pic: cloudinaryUrl,
         loginType: "google",
       });
     }
@@ -44,6 +46,34 @@ const googleLogin = async (req, res) => {
     res.status(500).json({
       message: "internal server error",
     });
+  }
+};
+
+// Upload Google profile picture to Cloudinary
+const uploadGooglePictureToCloudinary = async (googleImageUrl) => {
+  try {
+    const formData = new FormData();
+    formData.append("file", googleImageUrl);
+    formData.append("upload_preset", "chat-app");
+
+    const uploadRes = await fetch(
+      "https://api.cloudinary.com/v1_1/dkgvimtjm/image/upload",
+      {
+        method: "POST",
+        body: formData,
+      }
+    );
+
+    const uploadData = await uploadRes.json();
+
+    if (uploadData.secure_url) {
+      return uploadData.secure_url;
+    } else {
+      throw new Error(uploadData.error?.message || "Cloudinary upload failed.");
+    }
+  } catch (err) {
+    console.error("Image upload failed:", err.message);
+    return null;
   }
 };
 
@@ -105,7 +135,26 @@ async function allUsers(req, res) {
       }
     : {};
 
+    if (keyword === "/^[^a-zA-Z0-9]+$/" || Object.keys(keyword).length === 0) {
+      return res
+        .status(400)
+        .json({ message: "Please provide user's name or email to search." });
+    }
+
   const users = await User.find(keyword).find({ _id: { $ne: req.user._id } });
+//   const search = req.query.search?.trim().toLowerCase();
+
+// if (!search || search.length < 2 || /^[^a-zA-Z0-9]+$/.test(search)) {
+//   return res.status(400).json({ message: "Invalid search input." });
+// }
+
+// const users = await User.find({
+//   _id: { $ne: req.user._id },
+//   $or: [
+//     { $expr: { $eq: [{ $toLower: "$name" }, search] } },
+//     { $expr: { $eq: [{ $toLower: "$email" }, search] } }
+//   ]
+// });
 
   res.status(200).json(users);
 }

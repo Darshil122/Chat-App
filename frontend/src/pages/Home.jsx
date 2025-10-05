@@ -24,7 +24,7 @@ const Home = () => {
       if (authResult.code) {
         const result = await googleAuth(authResult.code);
         const { token } = result.data;
-        console.log("Google user", token);
+        // console.log("Google user", token);
         jsonWebToken(token);
         navigate("/chat");
       } else {

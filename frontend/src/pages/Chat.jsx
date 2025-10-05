@@ -7,8 +7,7 @@ const Chat = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
-    <div className="flex h-screen overflow-hidden">
-
+    <div className="flex h-[calc(100vh-72px)]">
       {/* Sidebar */}
       <SideBar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
 

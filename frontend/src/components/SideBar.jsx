@@ -81,7 +81,7 @@ const SideBar = ({ sidebarOpen, setSidebarOpen }) => {
               />
             </li>
             {serachTerm.trim() !== "" ? (
-              <div className="max-h-60 overflow-y-auto">
+              <div className="h-full">
                 {loading && <p className="text-gray-500">Loading...</p>}
                 {!loading && searchResults.length === 0 && (
                   <p className="text-gray-500">No users found.</p>
