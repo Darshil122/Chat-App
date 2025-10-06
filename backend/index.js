@@ -17,7 +17,7 @@ app.use(express.json());
 mongoose
   .connect(process.env.MONGODB_URL)
   .then(() => console.log("DB Connected"))
-  .catch((err) => console.error(err));
+  .catch((err) => console.error("something error",err));
 
   // routes
   app.use("/auth", require("./routes/AuthRouter"));
