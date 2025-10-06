@@ -2,14 +2,15 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useGoogleLogin } from "@react-oauth/google";
 import { googleAuth } from "../Api";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-hot-toast";
+import axios from "axios";
 
 const Home = () => {
   const [isLogin, setIsLogin] = useState(true);
   const [image, setImage] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
   const {
     register,
     handleSubmit,
@@ -190,12 +191,12 @@ const Home = () => {
               <strong className="text-red-500">{errors.email.message}</strong>
             )}
           </div>
-          <div className="mb-4">
+          <div className="mb-2">
             <label htmlFor="password" className="font-semibold text-gray-700">
               Password:
             </label>
             <input
-              type="password"
+              type={isVisible ? "text" : "password"}
               placeholder="Enter password"
               id="password"
               className="w-full border border-gray-300 p-2 focus:outline-none focus:ring-1 focus:ring-blue-500 rounded-md"
@@ -212,6 +213,20 @@ const Home = () => {
                 {errors.password.message}
               </strong>
             )}
+          </div>
+          <div className="mb-3">
+            <input
+              type="checkbox"
+              id="showPassword"
+              className="me-2"
+              onClick={() => setIsVisible(!isVisible)}
+            />
+            <label
+              htmlFor="showPassword"
+              className="font-semibold text-gray-700"
+            >
+              {isVisible ? "Hide Password" : "Show Password"}
+            </label>
           </div>
           {!isLogin && (
             <div className="mb-4">

@@ -7,9 +7,7 @@ const userSchema = mongoose.Schema(
     password: { type: String },
     pic: {
       type: String,
-      required: true,
-      default:
-        "https://static.vecteezy.com/system/resources/previews/009/292/244/non_2x/default-avatar-icon-of-social-media-user-vector.jpg",
+      required: true
     },
     loginType: { type: String, enum: ["manual", "google"], default: "manual" },
   },

@@ -72,7 +72,8 @@ const SideBar = ({ sidebarOpen, setSidebarOpen }) => {
                 placeholder="Search User..."
                 id="search"
                 name="search"
-                className="w-full pr-10 px-3 py-2 rounded-md bg-white dark:bg-gray-700 text-white placeholder:text-gray-300 border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full pr-10 px-3 py-2 rounded-md dark:bg-gray-700 text-white placeholder:text-gray-300 border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                autoComplete="off"
               />
               <FontAwesomeIcon
                 onClick={handleInputClick}
@@ -87,7 +88,7 @@ const SideBar = ({ sidebarOpen, setSidebarOpen }) => {
                     {" "}
                     <div class="flex items-center mt-4">
                       <svg
-                        class="w-10 h-10 me-3 text-gray-200 dark:text-gray-700"
+                        class="w-12 h-12 me-3 text-gray-200 dark:text-gray-700"
                         aria-hidden="true"
                         xmlns="http://www.w3.org/2000/svg"
                         fill="currentColor"
@@ -97,7 +98,7 @@ const SideBar = ({ sidebarOpen, setSidebarOpen }) => {
                       </svg>
                       <div>
                         <div class="h-2.5 bg-gray-200 rounded-full dark:bg-gray-700 w-32 mb-2"></div>
-                        <div class="w-48 h-2 bg-gray-200 rounded-full dark:bg-gray-700"></div>
+                        <div class="w-10 h-2 bg-gray-200 rounded-full dark:bg-gray-700"></div>
                       </div>
                     </div>
                   </p>

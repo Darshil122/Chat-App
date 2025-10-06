@@ -18,7 +18,7 @@ const googleLogin = async (req, res) => {
     );
 
     const { email, name, picture } = userRes.data;
-    const cloudinaryUrl = await uploadGooglePictureToCloudinary(picture);
+    const cloudinaryUrl = await uploadToCloudinary(picture);
     // console.log("google user info", email, name, picture);
 
     // Check if user exists or create new
@@ -50,10 +50,10 @@ const googleLogin = async (req, res) => {
 };
 
 // Upload Google profile picture to Cloudinary
-const uploadGooglePictureToCloudinary = async (googleImageUrl) => {
+const uploadToCloudinary = async (imageUrl) => {
   try {
     const formData = new FormData();
-    formData.append("file", googleImageUrl);
+    formData.append("file", imageUrl);
     formData.append("upload_preset", "chat-app");
 
     const uploadRes = await fetch(
@@ -64,12 +64,12 @@ const uploadGooglePictureToCloudinary = async (googleImageUrl) => {
       }
     );
 
-    const uploadData = await uploadRes.json();
+    const data = await uploadRes.json();
 
-    if (uploadData.secure_url) {
-      return uploadData.secure_url;
+    if (data.secure_url) {
+      return data.secure_url;
     } else {
-      throw new Error(uploadData.error?.message || "Cloudinary upload failed.");
+      throw new Error(data.error?.message || "Cloudinary upload failed.");
     }
   } catch (err) {
     console.error("Image upload failed:", err.message);
@@ -81,6 +81,20 @@ async function userSignUp(req, res) {
   const { name, email, password, pic } = req.body;
   let user = await User.findOne({ email });
   if (user) return res.status(400).json({ message: "User already exists" });
+
+  // let uploadPicUrl = null;
+  // if(pic){
+  //   const allowedExtensions = ["jpg", "jpeg", "png"];
+  //   const picExtension = pic.split('.').pop().toLowerCase();
+  //   if(!allowedExtensions.includes(picExtension)){
+  //     return res.status(400).json({ message: "Please upload jpg, jpeg, png format image." });
+  //   }
+  //   uploadPicUrl = await uploadToCloudinary(pic);
+  //   console.log("image upload url", uploadPicUrl);
+  //   if(!uploadPicUrl){
+  //     return res.status(500).json({ message: "Image upload failed. Please try again." });
+  //   }
+  // }
 
   const hashPassword = await bcrypt.hash(password, 10);
   user = new User({
