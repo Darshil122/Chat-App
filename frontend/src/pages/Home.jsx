@@ -43,7 +43,6 @@ const Home = () => {
     onSuccess: responseGoogle,
     onError: responseGoogle,
     flow: "auth-code",
-    // ux_mode : "popup",
   });
 
   const formSubmit = async (data) => {

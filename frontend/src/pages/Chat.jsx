@@ -23,9 +23,11 @@ const Chat = () => {
           </button>
         </header>
 
-        <main className="flex-1 p-6 overflow-auto">
-          <h2 className="text-2xl font-bold text-gray-800 mb-4">Chat Area</h2>
-          hello
+        <main className="overflow-auto">
+          <div className="p-10">
+            <h2 className="text-2xl font-bold text-gray-800 mb-4">Chat Area</h2>
+            <p>Start chatting here...</p>
+          </div>
         </main>
       </div>
     </div>

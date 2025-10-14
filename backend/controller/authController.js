@@ -19,7 +19,6 @@ const googleLogin = async (req, res) => {
 
     const { email, name, picture } = userRes.data;
     const cloudinaryUrl = await uploadToCloudinary(picture);
-    // console.log("google user info", email, name, picture);
 
     // Check if user exists or create new
     let user = await User.findOne({ email });
