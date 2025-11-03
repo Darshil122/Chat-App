@@ -10,7 +10,6 @@ import { accessChat, fetchChat } from "../features/chatSlice";
 import ChatItem from "./miscellaneous/ChatItem";
 import { createSelector } from "@reduxjs/toolkit";
 
-// ✅ Memoized selector (outside component)
 const selectActiveChats = createSelector(
   (state) => state.chats,
   (chats) => chats?.filter((c) => c.isGroupChat) || []
@@ -21,31 +20,28 @@ const SideBar = ({ sidebarOpen, setSidebarOpen }) => {
   const inputRef = useRef(null);
   const [searchTerm, setSearchTerm] = useState("");
 
-  // Redux state (memoized and stable)
   const user = useSelector((state) => state.user.userProfile, shallowEqual);
   const userLoading = useSelector((state) => state.user.loading);
   const searchResults = useSelector(
     (state) => state.user.searchResults,
     shallowEqual
   );
-  const chats = useSelector((state) => state.chats, shallowEqual);
+  const chats = useSelector((state) => state.chats);
+  console.log("chats in sidebar", chats);
   // const chatError = useSelector((state) => state.chats.error);
   const activeChats = useSelector(selectActiveChats);
 
-  // Fetch data on mount
   useEffect(() => {
     dispatch(userInfo());
     dispatch(fetchChat());
   }, [dispatch]);
 
-  // Search handling
   const handleSearchChange = (e) => {
     const value = e.target.value;
     setSearchTerm(value);
     if (value.trim()) dispatch(searchUsers(value));
   };
 
-  // Start chat on user click
   const handleUserClick = (userId) => {
     dispatch(accessChat(userId));
     setSearchTerm("");

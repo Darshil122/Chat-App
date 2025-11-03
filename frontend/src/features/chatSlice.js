@@ -90,6 +90,7 @@ const chatSlice = createSlice({
        .addCase(fetchChat.fulfilled, (state, action) => {
          state.loading = false;
          state.chats = action.payload;
+         console.log("state chats after fetch", state.chats);
          state.error = null;
        })
        .addCase(fetchChat.rejected, (state, action) => {
