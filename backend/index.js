@@ -7,26 +7,10 @@ const PORT = process.env.PORT || 8000;
 const app = express();
 dotenv.config();
 
-// ✅ Allow both localhost and deployed frontend
-const allowedOrigins = [
-  "http://localhost:5173", // local dev frontend
-  "https://real-time-chat-app-81hp.onrender.com", // deployed frontend
-];
-
-app.use(
-  cors({
-    origin: function (origin, callback) {
-      // Allow requests with no origin (like mobile apps, curl, etc.)
-      if (!origin) return callback(null, true);
-      if (allowedOrigins.indexOf(origin) === -1) {
-        const msg = "The CORS policy does not allow access from this origin.";
-        return callback(new Error(msg), false);
-      }
-      return callback(null, true);
-    },
-    credentials: true,
-  })
-);
+app.use(cors({
+  origin: process.env.FRONTEND_URL,
+  credentials: true,
+}));
 app.use(express.json());
 
 // connect db
