@@ -8,7 +8,7 @@ const app = express();
 dotenv.config();
 
 app.use(cors({
-  origin: process.env.FRONTEND_URL,
+  origin: "https://real-time-chat-app-81hp.onrender.com",
   credentials: true,
 }));
 app.use(express.json());
