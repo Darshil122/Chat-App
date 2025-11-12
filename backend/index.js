@@ -7,10 +7,7 @@ const PORT = process.env.PORT || 8000;
 const app = express();
 dotenv.config();
 
-app.use(cors({
-  origin: process.env.FRONTEND_URL,
-  credentials: true,
-}));
+app.use(cors());
 app.use(express.json());
 
 // connect db

@@ -8,17 +8,19 @@ import { useDispatch, useSelector, shallowEqual } from "react-redux";
 import { searchUsers, userInfo } from "../features/userSlice";
 import { accessChat, fetchChat } from "../features/chatSlice";
 import ChatItem from "./miscellaneous/ChatItem";
-import { createSelector } from "@reduxjs/toolkit";
+import GroupModel from "./miscellaneous/GroupModel";
+// import { createSelector } from "@reduxjs/toolkit";
 
-const selectActiveChats = createSelector(
-  (state) => state.chats,
-  (chats) => chats?.filter((c) => c.isGroupChat) || []
-);
+// const selectActiveChats = createSelector(
+//   (state) => state.chats.chats,
+//   (chats) => chats?.filter((c) => c.isGroupChat) || []
+// );
 
 const SideBar = ({ sidebarOpen, setSidebarOpen }) => {
   const dispatch = useDispatch();
   const inputRef = useRef(null);
   const [searchTerm, setSearchTerm] = useState("");
+  const [isGroupModelOpen, setIsGroupModelOpen] = useState(false);
 
   const user = useSelector((state) => state.user.userProfile, shallowEqual);
   const userLoading = useSelector((state) => state.user.loading);
@@ -26,15 +28,18 @@ const SideBar = ({ sidebarOpen, setSidebarOpen }) => {
     (state) => state.user.searchResults,
     shallowEqual
   );
-  const chats = useSelector((state) => state.chats);
-  console.log("chats in sidebar", chats);
-  // const chatError = useSelector((state) => state.chats.error);
-  const activeChats = useSelector(selectActiveChats);
+  const chats = useSelector((state) => state.chats.chats);
+  // console.log("chats in sidebar", chats);
+  // const activeChats = useSelector(selectActiveChats);
 
   useEffect(() => {
     dispatch(userInfo());
     dispatch(fetchChat());
   }, [dispatch]);
+
+  const handleGroupModel = () => {
+    setIsGroupModelOpen(true);
+  }
 
   const handleSearchChange = (e) => {
     const value = e.target.value;
@@ -75,6 +80,7 @@ const SideBar = ({ sidebarOpen, setSidebarOpen }) => {
             <button
               type="button"
               title="Create New Group"
+              onClick={handleGroupModel}
               className="flex items-center gap-2 text-white bg-gray-500 hover:bg-gray-600 py-2 px-4 rounded-lg transition-colors duration-200"
             >
               <FontAwesomeIcon icon={faUserGroup} />
@@ -130,13 +136,13 @@ const SideBar = ({ sidebarOpen, setSidebarOpen }) => {
           ) : (
             <>
               {/* Recent Chats */}
-              <h2 className="text-gray-500 uppercase text-xs mt-4">
+              <h2 className="text-gray-500 text-xs mt-4">
                 Recent Chats
               </h2>
 
               {Array.isArray(chats) && chats.length > 0 ? (
                 chats.map((chat) => (
-                  <ChatItem key={chat._id || chat.id} chat={chat} />
+                  <ChatItem key={chat._id || chat.id} chat={chat} currentUser = {user}/>
                 ))
               ) : (
                 <p className="text-gray-500">No chats yet</p>
@@ -145,6 +151,11 @@ const SideBar = ({ sidebarOpen, setSidebarOpen }) => {
           )}
         </div>
       </aside>
+
+       {/* Group Modal */}
+      {isGroupModelOpen && (
+        <GroupModel handleClose={() => setIsGroupModelOpen(false)}/>
+      )}
     </>
   );
 };
