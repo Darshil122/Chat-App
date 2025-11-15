@@ -8,6 +8,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import Logout from "./components/Logout";
 import { Toaster } from "react-hot-toast";
 import UserProfile from "./pages/UserProfile";
+import EditUserProfile from "./pages/EditUserProfile";
 
 function App() {
   return (
@@ -25,6 +26,7 @@ function App() {
           }
         />
         <Route path="/profile" element={<UserProfile />}/>
+        <Route path="/editprofile" element={<EditUserProfile />}/>
         <Route path="/logout" element={<Logout />} />
         <Route path="*" element={<PageNotFound />} />
       </Routes>

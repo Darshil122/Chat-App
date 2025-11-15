@@ -78,25 +78,17 @@ const uploadToCloudinary = async (imageUrl) => {
 
 async function userSignUp(req, res) {
   const { name, email, password, pic } = req.body;
-  let user = await User.findOne({ email });
-  if (user) return res.status(400).json({ message: "User already exists" });
+  const existingEmail = await User.findOne({ email });
+  const existingName = await User.findOne({ name });
 
-  // let uploadPicUrl = null;
-  // if(pic){
-  //   const allowedExtensions = ["jpg", "jpeg", "png"];
-  //   const picExtension = pic.split('.').pop().toLowerCase();
-  //   if(!allowedExtensions.includes(picExtension)){
-  //     return res.status(400).json({ message: "Please upload jpg, jpeg, png format image." });
-  //   }
-  //   uploadPicUrl = await uploadToCloudinary(pic);
-  //   console.log("image upload url", uploadPicUrl);
-  //   if(!uploadPicUrl){
-  //     return res.status(500).json({ message: "Image upload failed. Please try again." });
-  //   }
-  // }
+  if (existingName) {
+    return res.status(400).json({ message: "Username already exists" });
+  } else if (existingEmail) {
+    return res.status(400).json({ message: "Email already exists" });
+  }
 
   const hashPassword = await bcrypt.hash(password, 10);
-  user = new User({
+  const user = new User({
     name,
     email,
     password: hashPassword,
@@ -115,10 +107,10 @@ async function userSignUp(req, res) {
 }
 
 async function userSignIn(req, res) {
-  const { email, password } = req.body;
+  const { name, password } = req.body;
 
-  let user = await User.findOne({ email });
-  if (!user) return res.status(400).json({ message: "User not found" });
+  let user = await User.findOne({ name });
+  if (!user) return res.status(400).json({ message: "UserName not found" });
 
   const isMatch = await bcrypt.compare(password, user.password);
   if (!isMatch)
@@ -148,29 +140,71 @@ async function allUsers(req, res) {
       }
     : {};
 
-    if (keyword === "/^[^a-zA-Z0-9]+$/" || Object.keys(keyword).length === 0) {
-      return res
-        .status(400)
-        .json({ message: "Please provide user's name or email to search." });
-    }
+  if (keyword === "/^[^a-zA-Z0-9]+$/" || Object.keys(keyword).length === 0) {
+    return res
+      .status(400)
+      .json({ message: "Please provide user's name or email to search." });
+  }
 
   const users = await User.find(keyword).find({ _id: { $ne: req.user._id } });
-//   const search = req.query.search?.trim().toLowerCase();
+  //   const search = req.query.search?.trim().toLowerCase();
 
-// if (!search || search.length < 2 || /^[^a-zA-Z0-9]+$/.test(search)) {
-//   return res.status(400).json({ message: "Invalid search input." });
-// }
+  // if (!search || search.length < 2 || /^[^a-zA-Z0-9]+$/.test(search)) {
+  //   return res.status(400).json({ message: "Invalid search input." });
+  // }
 
-// const users = await User.find({
-//   _id: { $ne: req.user._id },
-//   $or: [
-//     { $expr: { $eq: [{ $toLower: "$name" }, search] } },
-//     { $expr: { $eq: [{ $toLower: "$email" }, search] } }
-//   ]
-// });
+  // const users = await User.find({
+  //   _id: { $ne: req.user._id },
+  //   $or: [
+  //     { $expr: { $eq: [{ $toLower: "$name" }, search] } },
+  //     { $expr: { $eq: [{ $toLower: "$email" }, search] } }
+  //   ]
+  // });
 
   res.status(200).json(users);
 }
+
+async function editProfile(req, res) {
+  const {name, email, pic} = req.body;
+  // const existingEmail = await User.findOne({ email });
+  // const existingName = await User.findOne({ name });
+  const userId = req.user.id;
+  const user = await User.findById(userId);
+  if(!user){
+    return res.status(404).json({message: "User not found"});
+  }
+
+
+  if (name && name !== user.name) {
+    const existingName = await User.findOne({
+      name: { $regex: new RegExp("^" + name + "$", "i") },
+    });
+
+    if (existingName && existingName._id.toString() !== userId) {
+      return res.status(400).json({ message: "Username already exists" });
+    }
+
+    user.name = name;
+  }
+  
+  if (email && email !== user.email) {
+    const existingEmail = await User.findOne({ email });
+
+    if (existingEmail && existingEmail._id.toString() !== userId) {
+      return res.status(400).json({ message: "Email already exists" });
+    }
+
+    user.email = email;
+  }
+
+   if (pic) {
+     user.pic = pic;
+   }
+
+  await user.save();
+  res.status(200).json({message: "Profile updated successfully", user});
+}
+
 
 module.exports = {
   googleLogin,
@@ -178,4 +212,5 @@ module.exports = {
   userSignUp,
   getUserFromToken,
   allUsers,
+  editProfile,
 };

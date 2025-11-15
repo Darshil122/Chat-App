@@ -16,12 +16,12 @@ const UserProfile = () => {
   const { userProfile: user, loading } = useSelector(
     (state) => state.user || {}
   );
-
+  
   useEffect(() => {
     dispatch(userInfo());
   }, [dispatch]);
-
-  if (loading) {
+  
+  if (loading || !user) {
     return (
       <div className="flex justify-center items-center h-screen text-gray-500 text-lg">
         Loading profile...
@@ -29,9 +29,7 @@ const UserProfile = () => {
     );
   }
 
-  if (!user) {
-    navigate("/login");
-  }
+  
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900 px-4 py-8">
@@ -40,6 +38,7 @@ const UserProfile = () => {
         <button
           className="absolute top-4 right-4 text-gray-500 hover:text-blue-500"
           title="Edit Profile"
+          onClick={() => navigate("/editprofile")}
         >
           <FontAwesomeIcon icon={faEdit} size="lg" />
         </button>
@@ -89,7 +88,7 @@ const UserProfile = () => {
 
         {/* Action Buttons */}
         <div className="mt-6 flex justify-between">
-          <button className="bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-lg transition">
+          <button className="bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-lg transition" onClick={() => navigate("/editprofile")}>
             Edit Profile
           </button>
           <button className="bg-red-500 hover:bg-red-600 text-white font-medium py-2 px-4 rounded-lg transition" onClick={() => navigate("/logout")}>

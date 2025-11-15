@@ -87,7 +87,7 @@ const Home = () => {
       }
 
       const payload = isLogin
-        ? { email: data.email, password: data.password }
+        ? { name: data.name, password: data.password }
         : { ...data, pic: imageUrl };
 
       // console.log("User Data", payload);
@@ -155,14 +155,13 @@ const Home = () => {
               Sign Up
             </button>
           </div>
-          {!isLogin && (
             <div className="mb-4">
               <label htmlFor="name" className="font-semibold text-gray-700">
-                Name:
+                User Name:
               </label>
               <input
                 type="text"
-                placeholder="Enter Name"
+                placeholder="Enter User Name"
                 id="name"
                 className="w-full border border-gray-300 p-2 focus:outline-none focus:ring-1 focus:ring-blue-500 rounded-md"
                 autoComplete="name"
@@ -172,7 +171,7 @@ const Home = () => {
                 <strong className="text-red-500">{errors.name.message}</strong>
               )}
             </div>
-          )}
+          {!isLogin && (
           <div className="mb-4">
             <label htmlFor="email" className="font-semibold text-gray-700">
               Email:
@@ -190,6 +189,7 @@ const Home = () => {
               <strong className="text-red-500">{errors.email.message}</strong>
             )}
           </div>
+          )}
           <div className="mb-2">
             <label htmlFor="password" className="font-semibold text-gray-700">
               Password:

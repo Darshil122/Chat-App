@@ -4,6 +4,7 @@ const {
   userSignUp,
   getUserFromToken,
   allUsers,
+  editProfile,
 } = require("../controller/authController");
 const { authenticateToken } = require("../middleware/authenticateToken");
 const express = require("express");
@@ -18,5 +19,6 @@ router.post("/login", userSignIn);
 router.post("/google", googleLogin);
 router.get("/user", authenticateToken, allUsers);
 router.get("/me", authenticateToken, getUserFromToken);
+router.put("/editProfile", authenticateToken, editProfile);
 
 module.exports = router;

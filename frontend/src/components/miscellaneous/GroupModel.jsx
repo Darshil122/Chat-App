@@ -37,8 +37,14 @@ const GroupModel = ({ handleClose }) => {
 
   // ✅ create group
   const handleCreateGroup = () => {
-    if (!groupName || selectedUsers.length < 2) {
-      toast.error("More than two users are required for the group chat");
+    
+    if(!groupName.trim()) {
+      toast.error("Group name is required");
+      return;
+    }else if (selectedUsers.length < 2) {
+      toast.error(
+        "More than two users are required for the group chat"
+      );
       return;
     }
 
@@ -86,6 +92,7 @@ const GroupModel = ({ handleClose }) => {
               {u.name}
               <button
                 onClick={() => handleRemoveUser(u._id)}
+                title="Remove User"
                 className="text-red-500 ml-1 cursor-pointer text-2xl"
               >
                 ×
