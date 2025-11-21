@@ -7,7 +7,7 @@ const ChatItem = ({ chat, currentUser }) => {
 
       const displayName = isGroupChat
         ? chatName
-        : otherUser?.name || "Unknown User";
+        : otherUser?.name;
       const displayPic = isGroupChat
         ? "https://static.vecteezy.com/ti/vetor-gratis/p1/24845472-conectados-comunidade-preto-glifo-ui-icone-social-meios-de-comunicacao-grupo-convite-trabalho-em-equipe-do-utilizador-interface-projeto-silhueta-simbolo-em-branco-espaco-solido-pictograma-para-rede-movel-isolado-ilustracao-vetor.jpg"
         : otherUser?.pic ||
@@ -27,7 +27,7 @@ const ChatItem = ({ chat, currentUser }) => {
       <div>
         <p className="font-semibold">{displayName}</p>
         <span className="text-xs text-gray-500 dark:text-gray-400 truncate block">
-          {isGroupChat ? "Group Chat" : "Direct Message"}
+          {isGroupChat ? "Group Chat" : "Message"}
         </span>
       </div>
     </div>

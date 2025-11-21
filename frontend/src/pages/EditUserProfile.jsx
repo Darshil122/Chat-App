@@ -93,7 +93,9 @@ const EditUserProfile = () => {
       email: form.email,
     };
 
-    await dispatch(updateProfile(updatedData));
+    await dispatch(updateProfile(updatedData)).then(() => {
+      toast.success("Profile updated successfully!");
+    })
     navigate("/profile");
   };
 
