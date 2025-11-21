@@ -37,7 +37,7 @@ export const searchUsers = createAsyncThunk(
           },
         }
       );
-    //   console.log("search users response", response);
+      //   console.log("search users response", response);
       return response.data;
     } catch (error) {
       return rejectWithValue(
@@ -47,11 +47,34 @@ export const searchUsers = createAsyncThunk(
   }
 );
 
+export const updateProfile = createAsyncThunk(
+  "user/updateProfile",
+  async (profileData, { rejectWithValue }) => {
+    try {
+      const token = JSON.parse(localStorage.getItem("token"));
+      const response = await axios.put(
+        `${import.meta.env.VITE_BACKEND_URL}/auth/editProfile`,
+        profileData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to update profile"
+      );
+    }
+  }
+);
+
 export const userSlice = createSlice({
   name: "user",
   initialState: {
     userProfile: null,
-    searchResults:[],
+    searchResults: [],
     loading: false,
     error: null,
   },
@@ -79,6 +102,18 @@ export const userSlice = createSlice({
         state.searchResults = action.payload;
       })
       .addCase(searchUsers.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(updateProfile.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(updateProfile.fulfilled, (state, action) => {
+        state.loading = false;
+        state.userProfile = action.payload;
+      })
+      .addCase(updateProfile.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });
