@@ -18,5 +18,6 @@ mongoose
   // routes
   app.use("/auth", require("./routes/AuthRouter"));
   app.use("/api/chat", require("./routes/ChatRouter"));
+  app.use("/api/message", require("./routes/MessageRouter"));
 
 app.listen(PORT, () => console.log(`Server started on port ${PORT}`));
