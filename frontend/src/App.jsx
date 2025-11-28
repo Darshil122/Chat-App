@@ -9,6 +9,7 @@ import Logout from "./components/Logout";
 import { Toaster } from "react-hot-toast";
 import UserProfile from "./pages/UserProfile";
 import EditUserProfile from "./pages/EditUserProfile";
+import GroupProfile from "./pages/GroupProfile";
 
 function App() {
   return (
@@ -25,8 +26,31 @@ function App() {
             </ProtectedRoute>
           }
         />
-        <Route path="/profile" element={<UserProfile />}/>
-        <Route path="/editprofile" element={<EditUserProfile />}/>
+        <Route
+          path="/GroupProfile/:id"
+          element={
+            <ProtectedRoute>
+              <Navbar />
+              <GroupProfile />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/profile"
+          element={
+            <ProtectedRoute>
+              <UserProfile />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/editprofile"
+          element={
+            <ProtectedRoute>
+              <EditUserProfile />
+            </ProtectedRoute>
+          }
+        />
         <Route path="/logout" element={<Logout />} />
         <Route path="*" element={<PageNotFound />} />
       </Routes>

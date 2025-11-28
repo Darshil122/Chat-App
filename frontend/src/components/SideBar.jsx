@@ -7,16 +7,12 @@ import {
 import { useDispatch, useSelector, shallowEqual } from "react-redux";
 import { searchUsers, userInfo } from "../features/userSlice";
 import { accessChat, fetchChat } from "../features/chatSlice";
+import { fetchMessages } from "../features/messageSlice";
 import ChatItem from "./miscellaneous/ChatItem";
 import GroupModel from "./miscellaneous/GroupModel";
-// import { createSelector } from "@reduxjs/toolkit";
 
-// const selectActiveChats = createSelector(
-//   (state) => state.chats.chats,
-//   (chats) => chats?.filter((c) => c.isGroupChat) || []
-// );
 
-const SideBar = ({ sidebarOpen, setSidebarOpen }) => {
+const SideBar = ({ sidebarOpen, setSidebarOpen, socket }) => {
   const dispatch = useDispatch();
   const inputRef = useRef(null);
   const [searchTerm, setSearchTerm] = useState("");
@@ -29,8 +25,6 @@ const SideBar = ({ sidebarOpen, setSidebarOpen }) => {
     shallowEqual
   );
   const chats = useSelector((state) => state.chats.chats);
-  // console.log("chats in sidebar", chats);
-  // const activeChats = useSelector(selectActiveChats);
 
   useEffect(() => {
     dispatch(userInfo());
@@ -39,7 +33,7 @@ const SideBar = ({ sidebarOpen, setSidebarOpen }) => {
 
   const handleGroupModel = () => {
     setIsGroupModelOpen(true);
-  }
+  };
 
   const handleSearchChange = (e) => {
     const value = e.target.value;
@@ -54,8 +48,6 @@ const SideBar = ({ sidebarOpen, setSidebarOpen }) => {
 
   const handleInputClick = () => inputRef.current?.focus();
 
-  // if (chatError)
-  //   return <p className="text-center text-red-500 py-4">Error: {chatError}</p>;
 
   return (
     <>
@@ -95,6 +87,7 @@ const SideBar = ({ sidebarOpen, setSidebarOpen }) => {
               value={searchTerm}
               onChange={handleSearchChange}
               type="text"
+              id="text"
               placeholder="Search User..."
               className="w-full pr-10 px-3 py-2 rounded-md dark:bg-gray-700 text-white placeholder:text-gray-300 border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
               autoComplete="off"
@@ -136,13 +129,16 @@ const SideBar = ({ sidebarOpen, setSidebarOpen }) => {
           ) : (
             <>
               {/* Recent Chats */}
-              <h2 className="text-gray-500 text-xs mt-4">
-                Recent Chats
-              </h2>
+              <h2 className="text-gray-500 text-xs mt-4">Recent Chats</h2>
 
               {Array.isArray(chats) && chats.length > 0 ? (
                 chats.map((chat) => (
-                  <ChatItem key={chat._id || chat.id} chat={chat} currentUser = {user}/>
+                  <ChatItem
+                    key={chat._id || chat.id}
+                    chat={chat}
+                    currentUser={user}
+                    socket={socket}
+                  />
                 ))
               ) : (
                 <p className="text-gray-500">No chats yet</p>
@@ -152,9 +148,9 @@ const SideBar = ({ sidebarOpen, setSidebarOpen }) => {
         </div>
       </aside>
 
-       {/* Group Modal */}
+      {/* Group Modal */}
       {isGroupModelOpen && (
-        <GroupModel handleClose={() => setIsGroupModelOpen(false)}/>
+        <GroupModel handleClose={() => setIsGroupModelOpen(false)} />
       )}
     </>
   );

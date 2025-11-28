@@ -108,10 +108,15 @@ const chatSlice = createSlice({
   initialState: {
     chats: [],
     chat: null,
+    selectedChat: null,
     loading: false,
     error: null,
   },
-  reducers: {},
+  reducers: {
+    setSelectedChat(state, action){
+      state.selectedChat = action.payload;
+    },
+  },
   extraReducers: (builder) => {
     builder
       // Access chat
@@ -183,4 +188,5 @@ const chatSlice = createSlice({
   },
 });
 
+export const { setSelectedChat } = chatSlice.actions;
 export default chatSlice.reducer;
