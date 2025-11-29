@@ -6,13 +6,14 @@ import ScrollToBottom from "react-scroll-to-bottom";
 import moment from "moment";
 import io from "socket.io-client";
 import { useNavigate } from "react-router-dom";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faBars, faPaperPlane } from "@fortawesome/free-solid-svg-icons";
 
 let socket;
 
 const Chat = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [newMessage, setNewMessage] = useState("");
-  const [showGroupProfile, setShowGroupProfile] = useState(false);
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -72,10 +73,18 @@ const Chat = () => {
 
       {/* Right Chat Window */}
       <div className="flex-1 flex flex-col bg-gray-100 dark:bg-gray-900">
+        {/* <button
+          className="text-gray-800 dark:text-white text-xl lg:hidden"
+          onClick={() => setSidebarOpen(!sidebarOpen)}
+          aria-label="Toggle Sidebar"
+        >
+          <FontAwesomeIcon icon={faBars} />
+        </button> */}
         {/* Header */}
         <header
           onClick={() =>
-            selectedChat.isGroupChat && navigate(`/GroupProfile/${selectedChat._id}`)
+            selectedChat.isGroupChat &&
+            navigate(`/GroupProfile/${selectedChat._id}`)
           }
           className="p-4 bg-white dark:bg-gray-800 shadow flex items-center gap-3 cursor-pointer"
         >
@@ -141,10 +150,23 @@ const Chat = () => {
 
         {/* Message Input */}
         {selectedChat && (
-          <footer className="p-4 bg-white dark:bg-gray-800 flex gap-2 shadow-lg">
+          <footer className="p-4 bg-white dark:bg-gray-800 flex gap-3 shadow-lg items-center">
+            <button
+              className="lg:hidden p-2 text-gray-800 dark:text-white"
+              onClick={() => setSidebarOpen(!sidebarOpen)}
+            >
+              <FontAwesomeIcon icon={faBars} className="text-xl" />
+            </button>
+
             <input
               value={newMessage}
               id="message"
+              onKeyDown={(e) => {
+                if(e.key === "Enter"){
+                  e.preventDefault();
+                  handleSend();
+                }
+              }}
               onChange={(e) => setNewMessage(e.target.value)}
               placeholder="Type a message..."
               className="flex-1 p-2 rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white outline-none"
@@ -153,9 +175,12 @@ const Chat = () => {
 
             <button
               onClick={handleSend}
-              className="bg-blue-600 text-white px-5 py-2 rounded-lg hover:bg-blue-700"
+              className="bg-blue-600 p-3 rounded-full hover:bg-blue-700 flex items-center justify-center shadow transition"
             >
-              Send
+              <FontAwesomeIcon
+                icon={faPaperPlane}
+                className="text-white text-lg"
+              />
             </button>
           </footer>
         )}
