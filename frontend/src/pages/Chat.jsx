@@ -4,18 +4,14 @@ import { useDispatch, useSelector } from "react-redux";
 import { sendMessage, fetchMessages } from "../features/messageSlice";
 import ScrollToBottom from "react-scroll-to-bottom";
 import moment from "moment";
-import io from "socket.io-client";
+import socket from "../socket";
 import { useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBars, faPaperPlane } from "@fortawesome/free-solid-svg-icons";
-// import EmojiPicker from "emoji-picker-react";
-
-let socket;
 
 const Chat = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [newMessage, setNewMessage] = useState("");
-  // const [showEmoji, setShowEmoji] = useState(false);
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -23,15 +19,14 @@ const Chat = () => {
   const { messages } = useSelector((state) => state.messages);
   const { userProfile } = useSelector((state) => state.user);
 
-  // SOCKET SETUP
+  //socket setup
   useEffect(() => {
-    socket = io(import.meta.env.VITE_BACKEND_URL);
     if (userProfile) {
       socket.emit("setup", userProfile);
     }
   }, [userProfile]);
 
-  // JOIN CHAT ROOM WHEN CHAT SELECTED
+  // Join chat when user selects one
   useEffect(() => {
     if (selectedChat?._id) {
       socket.emit("join chat", selectedChat._id);
@@ -39,14 +34,25 @@ const Chat = () => {
     }
   }, [selectedChat, dispatch]);
 
-  // LISTEN FOR MESSAGE FROM SOCKET
+  // recevied message
   useEffect(() => {
-    socket.on("message received", (msg) => {
-      dispatch({ type: "messages/addMessage", payload: msg });
-    });
-  }, []);
+    if (!socket) return;
 
-  // SEND MESSAGE
+    const handleMessage = (msg) => {
+      // Only add message if it belongs to currently opened chat
+      if (selectedChat?._id === msg.chat._id) {
+        dispatch({ type: "messages/addMessage", payload: msg });
+      }
+    };
+
+    socket.on("message received", handleMessage);
+
+    return () => {
+      socket.off("message received", handleMessage);
+    };
+  }, [selectedChat, dispatch]);
+
+  // send message
   const handleSend = () => {
     if (!newMessage.trim()) return;
 
@@ -55,14 +61,10 @@ const Chat = () => {
       .then((msg) => {
         socket.emit("new message", msg);
       });
+
     setNewMessage("");
   };
 
-  // const onEmojiClick = (emojiData) => {
-  //   setNewMessage((prev) => prev + emojiData);
-  // };
-
-  // USER OR GROUP DISPLAY
   const chatUser =
     selectedChat &&
     !selectedChat.isGroupChat &&
@@ -70,14 +72,14 @@ const Chat = () => {
 
   return (
     <div className="flex h-[calc(100vh-72px)]">
-      {/* Left Sidebar */}
+      {/* Sidebar */}
       <SideBar
         sidebarOpen={sidebarOpen}
         setSidebarOpen={setSidebarOpen}
         socket={socket}
       />
 
-      {/* Right Chat Window */}
+      {/* Chat Window */}
       <div className="flex-1 flex flex-col bg-gray-100 dark:bg-gray-900">
         {/* Header */}
         <header
@@ -87,19 +89,16 @@ const Chat = () => {
           }
           className="p-4 bg-white dark:bg-gray-800 shadow flex items-center gap-3 cursor-pointer relative"
         >
-          {/* Sidebar Toggle – Mobile Only */}
           <button
             className="text-gray-800 dark:text-white text-xl lg:hidden absolute left-3 top-1/2 -translate-y-1/2"
             onClick={(e) => {
-              e.stopPropagation(); // Prevent header click navigation
+              e.stopPropagation();
               setSidebarOpen(!sidebarOpen);
             }}
-            aria-label="Toggle Sidebar"
           >
             <FontAwesomeIcon icon={faBars} />
           </button>
 
-          {/* Chat User / Group Icon */}
           <div className="flex items-center gap-3 mx-auto lg:mx-0">
             {selectedChat ? (
               <>
@@ -127,7 +126,7 @@ const Chat = () => {
         </header>
 
         {/* Messages */}
-        <ScrollToBottom className="flex-1 overflow-y-auto p-4">
+        <ScrollToBottom className="scrollbar-hide flex-1 overflow-y-auto p-4">
           {messages?.map((msg) => {
             const isSender = msg.sender._id === userProfile._id;
 
@@ -143,13 +142,13 @@ const Chat = () => {
                     {msg.sender.name}
                   </span>
                 )}
+
                 <div
-                  className={`px-4 py-2 rounded-2xl max-w-xs text-sm shadow 
-                    ${
-                      isSender
-                        ? "bg-blue-600 text-white rounded-br-none"
-                        : "bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-bl-none"
-                    }`}
+                  className={`px-4 py-2 rounded-2xl max-w-xs text-sm shadow ${
+                    isSender
+                      ? "bg-blue-600 text-white rounded-br-none"
+                      : "bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-bl-none"
+                  }`}
                 >
                   {msg.content}
                 </div>
@@ -162,44 +161,22 @@ const Chat = () => {
           })}
         </ScrollToBottom>
 
-        {/* Message Input */}
+        {/* Input */}
         {selectedChat && (
-          <footer className="p-4 bg-white dark:bg-gray-800 flex gap-3 shadow-lg items-center relative">
-            {/* Emoji Toggle Button */}
-            {/* <button
-              onClick={() => setShowEmoji(!showEmoji)}
-              className="p-2 text-gray-800 dark:text-white"
-            >
-              <FontAwesomeIcon icon={faSmile} className="text-2xl" />
-            </button> */}
-
-            {/* Emoji Picker */}
-            {/* {showEmoji && (
-              <div className="absolute bottom-16 left-4 z-50">
-                <EmojiPicker theme="dark" onEmojiClick={onEmojiClick} />
-              </div>
-            )} */}
-
-            {/* Message Input */}
+          <footer className="p-4 bg-white dark:bg-gray-800 flex gap-3 shadow-lg items-center">
             <input
               value={newMessage}
-              id="message"
               onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  e.preventDefault();
-                  handleSend();
-                }
+                if (e.key === "Enter") handleSend();
               }}
               onChange={(e) => setNewMessage(e.target.value)}
               placeholder="Type a message..."
               className="flex-1 p-2 rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white outline-none"
-              autoComplete="off"
             />
 
-            {/* Send Button */}
             <button
               onClick={handleSend}
-              className="bg-blue-600 p-3 rounded-full hover:bg-blue-700 flex items-center justify-center shadow transition"
+              className="bg-blue-600 p-3 rounded-full hover:bg-blue-700 shadow"
             >
               <FontAwesomeIcon
                 icon={faPaperPlane}

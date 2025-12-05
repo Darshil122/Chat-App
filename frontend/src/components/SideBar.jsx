@@ -7,7 +7,6 @@ import {
 import { useDispatch, useSelector, shallowEqual } from "react-redux";
 import { searchUsers, userInfo } from "../features/userSlice";
 import { accessChat, fetchChat } from "../features/chatSlice";
-import { fetchMessages } from "../features/messageSlice";
 import ChatItem from "./miscellaneous/ChatItem";
 import GroupModel from "./miscellaneous/GroupModel";
 
@@ -138,6 +137,7 @@ const SideBar = ({ sidebarOpen, setSidebarOpen, socket }) => {
                     chat={chat}
                     currentUser={user}
                     socket={socket}
+                    setSidebarOpen={setSidebarOpen}
                   />
                 ))
               ) : (

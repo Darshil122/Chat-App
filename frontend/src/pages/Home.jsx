@@ -129,7 +129,7 @@ const Home = () => {
   return (
     <div className="bg-gray-100 min-h-screen flex flex-col items-center justify-center px-4">
       <div className="bg-white p-7 rounded-md shadow-md w-full max-w-sm">
-        <form onSubmit={handleSubmit(formSubmit)}>
+        <form onSubmit={handleSubmit(formSubmit)} disabled={loading}>
           {/* toggle button sign in && sign up */}
           <div className="flex justify-between mb-6">
             <button
@@ -155,40 +155,40 @@ const Home = () => {
               Sign Up
             </button>
           </div>
-            <div className="mb-4">
-              <label htmlFor="name" className="font-semibold text-gray-700">
-                User Name:
-              </label>
-              <input
-                type="text"
-                placeholder="Enter User Name"
-                id="name"
-                className="w-full border border-gray-300 p-2 focus:outline-none focus:ring-1 focus:ring-blue-500 rounded-md"
-                autoComplete="name"
-                {...register("name", { required: "name is required" })}
-              />
-              {errors.name && (
-                <strong className="text-red-500">{errors.name.message}</strong>
-              )}
-            </div>
-          {!isLogin && (
           <div className="mb-4">
-            <label htmlFor="email" className="font-semibold text-gray-700">
-              Email:
+            <label htmlFor="name" className="font-semibold text-gray-700">
+              User Name:
             </label>
             <input
-              type="email"
-              placeholder="Enter email"
-              id="email"
-              name="email"
-              autoComplete="email"
+              type="text"
+              placeholder="Enter User Name"
+              id="name"
               className="w-full border border-gray-300 p-2 focus:outline-none focus:ring-1 focus:ring-blue-500 rounded-md"
-              {...register("email", { required: "email is required" })}
+              autoComplete="off"
+              {...register("name", { required: "name is required" })}
             />
-            {errors.email && (
-              <strong className="text-red-500">{errors.email.message}</strong>
+            {errors.name && (
+              <strong className="text-red-500">{errors.name.message}</strong>
             )}
           </div>
+          {!isLogin && (
+            <div className="mb-4">
+              <label htmlFor="email" className="font-semibold text-gray-700">
+                Email:
+              </label>
+              <input
+                type="email"
+                placeholder="Enter email"
+                id="email"
+                name="email"
+                autoComplete="off"
+                className="w-full border border-gray-300 p-2 focus:outline-none focus:ring-1 focus:ring-blue-500 rounded-md"
+                {...register("email", { required: "email is required" })}
+              />
+              {errors.email && (
+                <strong className="text-red-500">{errors.email.message}</strong>
+              )}
+            </div>
           )}
           <div className="mb-2">
             <label htmlFor="password" className="font-semibold text-gray-700">
@@ -244,7 +244,6 @@ const Home = () => {
             className={`w-full font-bold text-xl bg-blue-500 hover:bg-blue-400 p-1.5 rounded-md ${
               loading ? "opacity-50 cursor-not-allowed" : ""
             }`}
-            disabled={loading}
           >
             {isLogin ? "Sign In" : "Sign Up"}
           </button>
@@ -253,6 +252,7 @@ const Home = () => {
         <button
           className="w-full rounded-md p-1.5 bg-gray-500 hover:bg-gray-400"
           onClick={() => loginWithGoogle()}
+          disabled={loading}
         >
           Login With Google
         </button>

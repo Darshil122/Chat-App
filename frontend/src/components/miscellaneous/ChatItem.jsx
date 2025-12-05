@@ -3,7 +3,7 @@ import { useDispatch } from "react-redux";
 import { setSelectedChat } from "../../features/chatSlice";
 import { fetchMessages } from "../../features/messageSlice";
 
-const ChatItem = ({ chat, currentUser, socket }) => {
+const ChatItem = ({ chat, currentUser, socket, setSidebarOpen }) => {
   const dispatch = useDispatch();
   const { chatName, isGroupChat, users } = chat;
 
@@ -19,6 +19,10 @@ const ChatItem = ({ chat, currentUser, socket }) => {
     dispatch(setSelectedChat(chat));
     dispatch(fetchMessages(chat._id));
     socket?.emit("join chat", chat._id);
+
+    if(window.innerWidth < 1024) {
+      setSidebarOpen(false);
+    }
   };
 
   return (

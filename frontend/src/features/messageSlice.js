@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
+import { fetchChat } from "./chatSlice";
 
 export const fetchMessages = createAsyncThunk(
   "messages/fetchMessages",
@@ -21,7 +22,7 @@ export const fetchMessages = createAsyncThunk(
 
 export const sendMessage = createAsyncThunk(
   "messages/sendMessage",
-  async ({ content, chatId }, { rejectWithValue }) => {
+  async ({ content, chatId }, { dispatch, rejectWithValue }) => {
     try {
       const token = JSON.parse(localStorage.getItem("token"));
 
@@ -34,7 +35,7 @@ export const sendMessage = createAsyncThunk(
           },
         }
       );
-
+      dispatch(fetchChat());
       return data;
     } catch (error) {
       return rejectWithValue(
