@@ -1,5 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
+import { toast } from "react-hot-toast";
 
 //access or create chat between logged in user and selected user
 export const accessChat = createAsyncThunk(
@@ -103,6 +104,67 @@ export const renameGroup = createAsyncThunk(
   }
 );
 
+//add user to group
+export const addUserToGroup = createAsyncThunk(
+  "chats/addUserToGroup",
+  async ({chatId, email},{rejectWithValue}) => {
+    const token = JSON.parse(localStorage.getItem("token"));
+    try{
+      //find userId by email
+      const userRes = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/auth/user?search=${email}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          },
+        }
+      );
+
+      const user = userRes.data[0];
+      if(!user) return rejectWithValue("User not found");
+
+      //add user to group
+      const response = await axios.put(`${import.meta.env.VITE_BACKEND_URL}/api/chat/groupadd`, 
+        { chatId, userId: user._id},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      toast.success(response.data.message);
+      // console.log(response.data.addUserToGroup);
+      return response.data.addUserToGroup;
+    }catch(err){
+      return rejectWithValue(err.response?.data?.message);
+    }
+  }
+);
+
+//remove user from group
+export const removeUserFromGroup = createAsyncThunk(
+  "chats/removeUserFromGroup",
+  async ({ chatId, userId }, { rejectWithValue }) => {
+    const token = JSON.parse(localStorage.getItem("token"));
+    try {
+      const response = await axios.put(
+        `${import.meta.env.VITE_BACKEND_URL}/api/chat/groupremove`,
+        { chatId, userId },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      toast.success(response.data.message);
+      return response.data.removedFromGroup;
+    } catch (err) {
+      return rejectWithValue(
+        err.response?.data?.message || "Failed to remove user from group"
+      );
+    }
+  }
+);
+
 const chatSlice = createSlice({
   name: "chats",
   initialState: {
@@ -175,7 +237,9 @@ const chatSlice = createSlice({
       .addCase(renameGroup.fulfilled, (state, action) => {
         state.loading = false;
         const updatedChat = action.payload;
-        const index = state.chats.findIndex((chat) => chat._id === updatedChat._id);
+        const index = state.chats.findIndex(
+          (chat) => chat._id === updatedChat._id
+        );
         if (index !== -1) {
           state.chats[index] = updatedChat;
         }
@@ -184,6 +248,52 @@ const chatSlice = createSlice({
       .addCase(renameGroup.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload || "Failed to rename group chat";
+      })
+      //add user to group
+      .addCase(addUserToGroup.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(addUserToGroup.fulfilled, (state) => {
+        state.loading = false;
+        const updatedChat = chat.action;
+
+        state.selectedChat = updatedChat;
+
+        const index = state.chats.findIndex(
+          (chat) => chat._id === updatedChat._id
+        );
+        if (index !== -1) {
+          state.chats[index] = updatedChat;
+        }
+        state.error = null;
+      })
+      .addCase(addUserToGroup.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      //remove user from group
+      .addCase(removeUserFromGroup.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(removeUserFromGroup.fulfilled, (state, action) => {
+        state.loading = false;
+        const updatedChat = action.payload;
+
+        state.selectedChat = updatedChat;
+
+        const index = state.chats.findIndex(
+          (chat) => chat._id === updatedChat._id
+        );
+        if (index !== -1) {
+          state.chats[index] = updatedChat;
+        }
+        state.error = null;
+      })
+      .addCase(removeUserFromGroup.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || "Failed to remove user";
       });
   },
 });

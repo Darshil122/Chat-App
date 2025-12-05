@@ -144,7 +144,7 @@ const addToGroup = async (req, res) => {
   if (!addUserToGroup) {
     res.status(404).json({ message: "Chat not found" });
   } else {
-    res.json({ message: "added new user in group", addUserToGroup });
+    res.json({ message: "add new user in group", addUserToGroup });
   }
 };
 
@@ -164,7 +164,7 @@ const removeFromGroup = async (req, res) => {
   if (!removedFromGroup) {
     res.status(404).json({ message: "Chat not found" });
   } else {
-    res.json({ message: "removed successfully", removedFromGroup });
+    res.json({ message: "User removed successfully", removedFromGroup });
   }
 };
 
