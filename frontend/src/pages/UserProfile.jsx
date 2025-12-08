@@ -13,23 +13,19 @@ import { useNavigate } from "react-router-dom";
 const UserProfile = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { userProfile: user, loading } = useSelector(
-    (state) => state.user || {}
-  );
-  
+  const { userProfile: user } = useSelector((state) => state.user || {});
+
   useEffect(() => {
     dispatch(userInfo());
   }, [dispatch]);
-  
-  if (loading || !user) {
+
+  if (!user) {
     return (
       <div className="flex justify-center items-center h-screen text-gray-500 text-lg">
         Loading profile...
       </div>
     );
   }
-
-  
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900 px-4 py-8">
@@ -88,10 +84,16 @@ const UserProfile = () => {
 
         {/* Action Buttons */}
         <div className="mt-6 flex justify-between">
-          <button className="bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-lg transition" onClick={() => navigate("/editprofile")}>
+          <button
+            className="bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-lg transition"
+            onClick={() => navigate("/editprofile")}
+          >
             Edit Profile
           </button>
-          <button className="bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-2 px-4 rounded-lg transition" onClick={() => navigate("/chat")}>
+          <button
+            className="bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-2 px-4 rounded-lg transition"
+            onClick={() => navigate("/chat")}
+          >
             Chat
           </button>
         </div>

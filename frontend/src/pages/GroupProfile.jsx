@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { addUserToGroup, removeUserFromGroup } from "../features/chatSlice";
@@ -7,23 +7,25 @@ const GroupProfile = () => {
   const { id } = useParams();
   const dispatch = useDispatch();
 
-  const { selectedChat, loading } = useSelector((state) => state.chats);  
+  const { selectedChat } = useSelector((state) => state.chats);
   const { userProfile: user } = useSelector((state) => state.user);
 
-  if (loading || !selectedChat) return <p className="p-5">Loading...</p>;
+  if (!selectedChat) return <p className="p-5">Loading...</p>;
 
-  const isAdmin = selectedChat.groupAdmin.name === user.name;
-  
+  const isAdmin = selectedChat.groupAdmin._id === user._id;
+
   return (
-    <div className="min-h-screen bg-gray-800">
-      <div className="max-w-lg mx-auto p-8">
+    <div className="h-screen bg-gray-800 overflow-hidden pt-16">
+      <div className="max-w-lg mx-auto p-6 overflow-y-auto h-full">
         <div className="text-center">
           <img
             src="https://cdn-icons-png.flaticon.com/512/847/847969.png"
             alt="Group"
             className="w-24 h-24 mx-auto rounded-full"
           />
-          <h2 className="text-2xl font-bold mt-3 text-white">{selectedChat.chatName}</h2>
+          <h2 className="text-2xl font-bold mt-3 text-white">
+            {selectedChat.chatName}
+          </h2>
           <p className="text-gray-50">Group Chat</p>
         </div>
 
