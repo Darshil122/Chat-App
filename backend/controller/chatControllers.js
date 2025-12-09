@@ -120,7 +120,7 @@ const renameGroup = async (req, res) => {
   if (!updatedChat) {
     res.status(404).json({ message: "Chat not found" });
   } else {
-    res.json(updatedChat);
+    res.json({ message: "Group name changed Successfully", updatedChat});
   }
 };
 
@@ -144,7 +144,7 @@ const addToGroup = async (req, res) => {
   if (!addUserToGroup) {
     res.status(404).json({ message: "Chat not found" });
   } else {
-    res.json({ message: "add new user in group", addUserToGroup });
+    res.json({ message: "New User added", addUserToGroup });
   }
 };
 

@@ -7,21 +7,20 @@ import storage from "redux-persist/lib/storage";
 import { persistReducer, persistStore } from "redux-persist";
 import { combineReducers } from "@reduxjs/toolkit";
 
-const rootReducer = combineReducers({
-  user: userSlice,
-  chats: chatSlice,
-  messages: messageSlice,
-});
-
-const persistConfig = {
-  key: "root",
+// Persist ONLY user slice
+const userPersistConfig = {
+  key: "user",
   storage,
 };
 
-const persistedReducer = persistReducer(persistConfig, rootReducer);
+const rootReducer = combineReducers({
+  user: persistReducer(userPersistConfig, userSlice), // persist only user
+  chats: chatSlice, // NOT persisted
+  messages: messageSlice, // NOT persisted
+});
 
 export const store = configureStore({
-  reducer: persistedReducer,
+  reducer: rootReducer,
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
       serializableCheck: false,

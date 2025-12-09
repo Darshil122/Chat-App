@@ -25,6 +25,10 @@ const ChatItem = ({ chat, currentUser, socket, setSidebarOpen }) => {
     }
   };
 
+  const message = chat?.latestMessage?.content;
+  const senderName = chat?.latestMessage?.sender?.name;
+
+
   return (
     <div
       key={chat._id}
@@ -39,20 +43,17 @@ const ChatItem = ({ chat, currentUser, socket, setSidebarOpen }) => {
       <div>
         <p className="font-semibold">{displayName}</p>
         <span className="text-xs text-gray-500 dark:text-gray-400 truncate block">
-          {chat.latestMessage
+          {message
             ? isGroupChat
-              ? //group chat
-                `${chat.latestMessage.sender?.name}: ${
-                  chat.latestMessage.content.length > 25
-                    ? chat.latestMessage.content.substring(0, 25) + "..."
-                    : chat.latestMessage.content
+              ? `${senderName || ""}: ${
+                  message.length > 35
+                    ? message.substring(0, 25) + "..."
+                    : message
                 }`
-              : // private chat
-              chat.latestMessage.content.length > 25
-              ? chat.latestMessage.content.substring(0, 25) + "..."
-              : chat.latestMessage.content
-            : // No messages yet
-            isGroupChat
+              : message.length > 25
+              ? message.substring(0, 25) + "..."
+              : message
+            : isGroupChat
             ? "Group created"
             : "Start a conversation"}
         </span>

@@ -171,6 +171,7 @@ const Chat = () => {
               }}
               onChange={(e) => setNewMessage(e.target.value)}
               placeholder="Type a message..."
+              name="message"
               className="flex-1 p-2 rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white outline-none"
             />
 

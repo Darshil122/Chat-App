@@ -95,6 +95,7 @@ export const renameGroup = createAsyncThunk(
           },
         }
       );
+      toast.success(response.data.message);
       return response.data;
     } catch (err) {
       return rejectWithValue(
@@ -107,24 +108,26 @@ export const renameGroup = createAsyncThunk(
 //add user to group
 export const addUserToGroup = createAsyncThunk(
   "chats/addUserToGroup",
-  async ({chatId, email},{rejectWithValue}) => {
+  async ({chatId, uname},{rejectWithValue}) => {
     const token = JSON.parse(localStorage.getItem("token"));
     try{
-      //find userId by email
-      const userRes = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/auth/user?search=${email}`,
+      //find userId by uname
+      const userRes = await axios.get(
+        `${import.meta.env.VITE_BACKEND_URL}/auth/user?search=${uname}`,
         {
           headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${token}`,
           },
         }
       );
 
       const user = userRes.data[0];
-      if(!user) return rejectWithValue("User not found");
+      if (!user) return rejectWithValue("User not found");
 
       //add user to group
-      const response = await axios.put(`${import.meta.env.VITE_BACKEND_URL}/api/chat/groupadd`, 
-        { chatId, userId: user._id},
+      const response = await axios.put(
+        `${import.meta.env.VITE_BACKEND_URL}/api/chat/groupadd`,
+        { chatId, userId: user._id },
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -229,34 +232,10 @@ const chatSlice = createSlice({
         state.loading = false;
         state.error = action.payload || "Failed to create group chat";
       })
-      // Rename group chat
-      .addCase(renameGroup.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
+      // Rename group
       .addCase(renameGroup.fulfilled, (state, action) => {
         state.loading = false;
         const updatedChat = action.payload;
-        const index = state.chats.findIndex(
-          (chat) => chat._id === updatedChat._id
-        );
-        if (index !== -1) {
-          state.chats[index] = updatedChat;
-        }
-        state.error = null;
-      })
-      .addCase(renameGroup.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload || "Failed to rename group chat";
-      })
-      //add user to group
-      .addCase(addUserToGroup.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
-      .addCase(addUserToGroup.fulfilled, (state) => {
-        state.loading = false;
-        const updatedChat = chat.action;
 
         state.selectedChat = updatedChat;
 
@@ -266,17 +245,23 @@ const chatSlice = createSlice({
         if (index !== -1) {
           state.chats[index] = updatedChat;
         }
-        state.error = null;
       })
-      .addCase(addUserToGroup.rejected, (state, action) => {
+      // Add user
+      .addCase(addUserToGroup.fulfilled, (state, action) => {
         state.loading = false;
-        state.error = action.payload;
+        const updatedChat = action.payload;
+
+        state.selectedChat = updatedChat;
+
+        const index = state.chats.findIndex(
+          (chat) => chat._id === updatedChat._id
+        );
+
+        if (index !== -1) {
+          state.chats[index] = updatedChat;
+        }
       })
-      //remove user from group
-      .addCase(removeUserFromGroup.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
+      // Remove user
       .addCase(removeUserFromGroup.fulfilled, (state, action) => {
         state.loading = false;
         const updatedChat = action.payload;
@@ -286,14 +271,10 @@ const chatSlice = createSlice({
         const index = state.chats.findIndex(
           (chat) => chat._id === updatedChat._id
         );
+
         if (index !== -1) {
           state.chats[index] = updatedChat;
         }
-        state.error = null;
-      })
-      .addCase(removeUserFromGroup.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload || "Failed to remove user";
       });
   },
 });
