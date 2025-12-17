@@ -12,10 +12,7 @@ const app = express();
 
 app.use(
   cors({
-    origin: [
-      "http://localhost:5173",
-      "https://your-frontend.onrender.com",
-    ],
+    origin: process.env.FRONTEND_URL,
     credentials: true,
   })
 );
