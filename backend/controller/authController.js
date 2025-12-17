@@ -131,38 +131,31 @@ async function getUserFromToken(req, res) {
 }
 
 async function allUsers(req, res) {
-  const keyword = req.query.search
-    ? {
-        $or: [
-          { name: { $regex: req.query.search, $options: "i" } },
-          { email: { $regex: req.query.search, $options: "i" } },
-        ],
-      }
-    : {};
+  try {
+    const search = req.query.search?.trim();
 
-  if (keyword === "/^[^a-zA-Z0-9]+$/" || Object.keys(keyword).length === 0) {
-    return res
-      .status(400)
-      .json({ message: "Please provide user's name or email to search." });
+    if (!search) {
+      return res
+        .status(400)
+        .json({ message: "Please provide username to search." });
+    }
+
+    const validSearchRegex = /^[a-zA-Z0-9 ]+$/;
+    if (!validSearchRegex.test(search)) {
+      return res.status(400).json({ message: "Invalid search input." });
+    }
+
+    const users = await User.find({
+      name: { $regex: search, $options: "i" },
+      _id: { $ne: req.user._id },
+    });
+
+    res.status(200).json(users);
+  } catch (error) {
+    res.status(500).json({ message: "Server error" });
   }
-
-  const users = await User.find(keyword).find({ _id: { $ne: req.user._id } });
-  //   const search = req.query.search?.trim().toLowerCase();
-
-  // if (!search || search.length < 2 || /^[^a-zA-Z0-9]+$/.test(search)) {
-  //   return res.status(400).json({ message: "Invalid search input." });
-  // }
-
-  // const users = await User.find({
-  //   _id: { $ne: req.user._id },
-  //   $or: [
-  //     { $expr: { $eq: [{ $toLower: "$name" }, search] } },
-  //     { $expr: { $eq: [{ $toLower: "$email" }, search] } }
-  //   ]
-  // });
-
-  res.status(200).json(users);
 }
+
 
 async function editProfile(req, res) {
   const {name, email, pic} = req.body;

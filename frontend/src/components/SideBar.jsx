@@ -18,11 +18,11 @@ const SideBar = ({ sidebarOpen, setSidebarOpen, socket }) => {
   const [isGroupModelOpen, setIsGroupModelOpen] = useState(false);
 
   const user = useSelector((state) => state.user.userProfile, shallowEqual);
-  const userLoading = useSelector((state) => state.user.loading);
-  const searchResults = useSelector(
-    (state) => state.user.searchResults,
-    shallowEqual
-  );
+ const { loading, searchResults, error } = useSelector(
+   (state) => state.user,
+   shallowEqual
+ );
+
   const chats = useSelector((state) => state.chats.chats);
 
   useEffect(() => {
@@ -78,7 +78,6 @@ const SideBar = ({ sidebarOpen, setSidebarOpen, socket }) => {
               <span>New Group</span>
             </button>
           </div>
-
           {/* Search Input */}
           <div className="relative w-full" title="Search User to Chat">
             <input
@@ -87,7 +86,7 @@ const SideBar = ({ sidebarOpen, setSidebarOpen, socket }) => {
               onChange={handleSearchChange}
               type="text"
               id="text"
-              placeholder="Search User..."
+              placeholder="Search User name..."
               className="w-full pr-10 px-3 py-2 rounded-md dark:bg-gray-700 text-white placeholder:text-gray-300 border border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
               autoComplete="off"
             />
@@ -97,53 +96,51 @@ const SideBar = ({ sidebarOpen, setSidebarOpen, socket }) => {
               className="absolute right-3 top-1/2 transform -translate-y-1/2 text-white cursor-pointer"
             />
           </div>
-
           {/* Conditional Rendering */}
           {searchTerm.trim() ? (
             <div className="space-y-2">
-              {userLoading ? (
-                <p className="text-gray-500">Searching...</p>
+              {loading ? (
+                <p className="text-gray-400">Searching...</p>
+              ) : error ? (
+                <p className="text-red-400 text-sm">{error}</p>
               ) : searchResults?.length > 0 ? (
                 searchResults.map((u) => (
                   <div
                     key={u._id}
                     onClick={() => handleUserClick(u._id)}
-                    className="flex items-center gap-3 px-3 py-2 rounded-lg cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-800 dark:text-white"
+                    className="flex items-center gap-3 px-3 py-2 rounded-lg cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700"
                   >
-                    <img
-                      src={u.pic}
-                      alt={u.name}
-                      className="w-10 h-10 rounded-full object-cover"
-                    />
+                    <img src={u.pic} className="w-10 h-10 rounded-full" />
                     <div>
-                      <p className="font-semibold">{u.name}</p>
-                      <span className="text-xs dark:text-gray-400">Chat</span>
+                      <p className="font-semibold text-white">{u.name}</p>
+                      <span className="text-xs text-gray-400">Chat</span>
                     </div>
                   </div>
                 ))
               ) : (
-                <p className="text-gray-500">No users found.</p>
+                <p className="text-gray-400">No users found</p>
               )}
             </div>
-          ) : (
-            <>
-              {/* Recent Chats */}
-              <h2 className="text-gray-500 text-xs mt-4">Recent Chats</h2>
+          ) : 
+          (
+          <>
+            {/* Recent Chats */}
+            <h2 className="text-gray-500 text-xs mt-4">Recent Chats</h2>
 
-              {Array.isArray(chats) && chats.length > 0 ? (
-                chats.map((chat) => (
-                  <ChatItem
-                    key={chat._id || chat.id}
-                    chat={chat}
-                    currentUser={user}
-                    socket={socket}
-                    setSidebarOpen={setSidebarOpen}
-                  />
-                ))
-              ) : (
-                <p className="text-gray-500">No chats yet</p>
-              )}
-            </>
+            {Array.isArray(chats) && chats.length > 0 ? (
+              chats.map((chat) => (
+                <ChatItem
+                  key={chat._id || chat.id}
+                  chat={chat}
+                  currentUser={user}
+                  socket={socket}
+                  setSidebarOpen={setSidebarOpen}
+                />
+              ))
+            ) : (
+              <p className="text-gray-500">No chats yet</p>
+            )}
+          </>
           )}
         </div>
       </aside>
