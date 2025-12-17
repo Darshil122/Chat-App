@@ -10,55 +10,69 @@ dotenv.config();
 const PORT = process.env.PORT || 8000;
 const app = express();
 
-// middlewares
-app.use(cors());
+app.use(
+  cors({
+    origin: [
+      "http://localhost:5173",
+      "https://your-frontend.onrender.com",
+    ],
+    credentials: true,
+  })
+);
+
 app.use(express.json());
 
-// connect db
 mongoose
   .connect(process.env.MONGODB_URL)
-  .then(() => console.log("DB Connected"))
-  .catch((err) => console.error("something error",err));
+  .then(() => console.log("MongoDB Connected"))
+  .catch((err) => console.error("MongoDB Error:", err));
 
-  // routes
-  app.use("/auth", require("./routes/AuthRouter"));
-  app.use("/api/chat", require("./routes/ChatRouter"));
-  app.use("/api/message", require("./routes/MessageRouter"));
+app.use("/auth", require("./routes/AuthRouter"));
+app.use("/api/chat", require("./routes/ChatRouter"));
+app.use("/api/message", require("./routes/MessageRouter"));
 
-  // create server
-  const server = http.createServer(app);
+const server = http.createServer(app);
 
-  // socket.io setup
-  const io = new Server(server, {
-    pingTimeout: 60000,
-    cors: {
-      origin: "*",
-    },
+const io = new Server(server, {
+  pingTimeout: 60000,
+  cors: {
+    origin: [
+      "http://localhost:3000",
+      "https://chat-app-2hwm.onrender.com",
+    ],
+    credentials: true,
+  },
+});
+
+io.on("connection", (socket) => {
+  console.log("Socket connected:", socket.id);
+
+  socket.on("setup", (user) => {
+    if (!user?._id) return;
+    socket.join(user._id);
+    socket.emit("connected");
   });
 
-  io.on("connection", (socket) => {
-    console.log("Connected to socket.io");
+  socket.on("join chat", (room) => {
+    socket.join(room);
+    console.log("User joined room:", room);
+  });
 
-    socket.on("setup", (user) => {
-      socket.join(user._id);
-      socket.emit("connected");
-    });
-    socket.on("join chat", (room) => {
-      socket.join(room);
-      console.log("User Joined Room: ", room);
-    });
-    socket.on("new message", (message) => {
-      const chat = message.chat;
-      if(!chat.users) return;
+  socket.on("new message", (message) => {
+    const chat = message.chat;
+    if (!chat?.users) return;
 
-      chat.users.forEach((u) => {
-        if(u._id == message.sender._id) return;
-        socket.in(u._id).emit("message received", message);
-      });
-    });
-    socket.on("disconnect", () => {
-      console.log("User Disconnected");
+    chat.users.forEach((u) => {
+      if (u._id === message.sender._id) return;
+      socket.in(u._id).emit("message received", message);
     });
   });
 
-server.listen(PORT, () => console.log(`Server started on port ${PORT}`));
+  socket.on("disconnect", () => {
+    console.log("Socket disconnected:", socket.id);
+  });
+});
+
+server.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
