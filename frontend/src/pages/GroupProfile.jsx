@@ -37,7 +37,7 @@ useEffect(() => {
         {/* Header */}
         <div className="text-center mb-6">
           <img
-            src="https://cdn-icons-png.flaticon.com/512/847/847969.png"
+            src="https://static.vecteezy.com/ti/vetor-gratis/p1/24845472-conectados-comunidade-preto-glifo-ui-icone-social-meios-de-comunicacao-grupo-convite-trabalho-em-equipe-do-utilizador-interface-projeto-silhueta-simbolo-em-branco-espaco-solido-pictograma-para-rede-movel-isolado-ilustracao-vetor.jpg"
             alt="Group"
             className="w-24 h-24 mx-auto rounded-full shadow-md"
           />

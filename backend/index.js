@@ -11,18 +11,20 @@ const PORT = process.env.PORT || 8000;
 const app = express();
 
 app.use(cors());
-
 app.use(express.json());
 
+//MongoDB Connect 
 mongoose
   .connect(process.env.MONGODB_URL)
   .then(() => console.log("MongoDB Connected"))
   .catch((err) => console.error("MongoDB Error:", err));
 
+  // Router
 app.use("/auth", require("./routes/AuthRouter"));
 app.use("/api/chat", require("./routes/ChatRouter"));
 app.use("/api/message", require("./routes/MessageRouter"));
 
+//Create Server
 const server = http.createServer(app);
 
 const io = new Server(server, {
@@ -37,7 +39,6 @@ const io = new Server(server, {
 });
 
 io.on("connection", (socket) => {
-  console.log("Socket connected:", socket.id);
 
   socket.on("setup", (user) => {
     if (!user?._id) return;
@@ -47,7 +48,6 @@ io.on("connection", (socket) => {
 
   socket.on("join chat", (room) => {
     socket.join(room);
-    console.log("User joined room:", room);
   });
 
   socket.on("new message", (message) => {
@@ -61,7 +61,7 @@ io.on("connection", (socket) => {
   });
 
   socket.on("disconnect", () => {
-    console.log("Socket disconnected:", socket.id);
+    console.log("Socket disconnected");
   });
 });
 
