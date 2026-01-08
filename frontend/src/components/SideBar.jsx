@@ -16,6 +16,8 @@ const SideBar = ({ sidebarOpen, setSidebarOpen, socket }) => {
   const inputRef = useRef(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [isGroupModelOpen, setIsGroupModelOpen] = useState(false);
+  const [onlineUsers, setOnlineUsers] = useState([]);
+
 
   const user = useSelector((state) => state.user.userProfile, shallowEqual);
  const { loading, searchResults, error } = useSelector(
@@ -44,6 +46,26 @@ const SideBar = ({ sidebarOpen, setSidebarOpen, socket }) => {
     dispatch(accessChat(userId));
     setSearchTerm("");
   };
+
+  useEffect(() => {
+    if (!socket || !user?._id) return;
+
+    socket.emit("setup", user._id);
+
+    socket.on("user online", (userId) => {
+      setOnlineUsers((prev) => [...new Set([...prev, userId])]);
+    });
+
+    socket.on("user offline", (userId) => {
+      setOnlineUsers((prev) => prev.filter((id) => id !== userId));
+    });
+
+    return () => {
+      socket.off("user online");
+      socket.off("user offline");
+    };
+  }, [socket, user]);
+
 
   const handleInputClick = () => inputRef.current?.focus();
 
@@ -134,6 +156,7 @@ const SideBar = ({ sidebarOpen, setSidebarOpen, socket }) => {
                   chat={chat}
                   currentUser={user}
                   socket={socket}
+                  onlineUsers={onlineUsers}
                   setSidebarOpen={setSidebarOpen}
                 />
               ))

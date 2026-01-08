@@ -12,6 +12,10 @@ import { faBars, faPaperPlane } from "@fortawesome/free-solid-svg-icons";
 const Chat = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [newMessage, setNewMessage] = useState("");
+  const [typing, setTyping] = useState(false);
+  const [isTyping, setIsTyping] = useState(false);
+  const [onlineUsers, setOnlineUsers] = useState([]);
+  let typingTimeout;
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -52,6 +56,21 @@ const Chat = () => {
     };
   }, [selectedChat, dispatch]);
 
+  // online/offline events
+  useEffect(() => {
+    socket.on("user online", (userId) => {
+      setOnlineUsers((prev) => [...new Set([...prev, userId])]);
+    });
+
+    socket.on("user offline", (userId) => {
+      setOnlineUsers((prev) => prev.filter((id) => id !== userId));
+    });
+    return () => {
+      socket.off("user online");
+      socket.off("user offline");
+    };
+  }, []);
+
   // send message
   const handleSend = () => {
     if (!newMessage.trim()) return;
@@ -65,10 +84,37 @@ const Chat = () => {
     setNewMessage("");
   };
 
+  // typing indicator
+  const typingHandler = (e) => {
+    setNewMessage(e.target.value);
+    if(!typing){
+      setTyping(true);
+      socket.emit("typing", selectedChat._id);
+    }
+
+    clearTimeout(typingTimeout);
+    typingTimeout = setTimeout(() => {
+      socket.emit("stop typing", selectedChat._id);
+      setTyping(false);
+    }, 1000);
+  };
+
+  useEffect(() => {
+    socket.on("typing", () => setIsTyping(true));
+    socket.on("stop typing", () => setIsTyping(false));
+
+    return () => {
+      socket.off("typing");
+      socket.off("stop typing");
+    };
+  }, []);
+
   const chatUser =
     selectedChat &&
     !selectedChat.isGroupChat &&
     selectedChat.users.find((u) => u._id !== userProfile._id);
+
+    const isOnline = onlineUsers.includes(chatUser?._id);
 
   return (
     <div className="flex h-[calc(100vh-72px)]">
@@ -102,6 +148,7 @@ const Chat = () => {
           <div className="flex items-center gap-3 mx-auto lg:mx-0">
             {selectedChat ? (
               <>
+                {/* Avatar */}
                 <img
                   src={
                     selectedChat.isGroupChat
@@ -111,11 +158,28 @@ const Chat = () => {
                   className="w-10 h-10 object-cover rounded-full"
                   alt="chat icon"
                 />
-                <h2 className="text-lg font-semibold text-gray-800 dark:text-white">
-                  {selectedChat.isGroupChat
-                    ? selectedChat.chatName
-                    : chatUser?.name}
-                </h2>
+
+                {/* Name + Status */}
+                <div className="flex flex-col leading-tight">
+                  <h2 className="text-base font-semibold text-gray-800 dark:text-white">
+                    {selectedChat.isGroupChat
+                      ? selectedChat.chatName
+                      : chatUser?.name}
+                  </h2>
+
+                  {/* Status / Typing */}
+                  {!selectedChat.isGroupChat && (
+                    <span className="text-xs text-gray-500 dark:text-gray-400">
+                      {isTyping ? (
+                        <span className="text-blue-500">typing...</span>
+                      ) : isOnline ? (
+                        <span className="text-green-500">Online</span>
+                      ) : (
+                        <span className="text-red-500">Offline</span>
+                      )}
+                    </span>
+                  )}
+                </div>
               </>
             ) : (
               <h2 className="text-lg text-gray-600 dark:text-white">
@@ -169,7 +233,7 @@ const Chat = () => {
               onKeyDown={(e) => {
                 if (e.key === "Enter") handleSend();
               }}
-              onChange={(e) => setNewMessage(e.target.value)}
+              onChange={typingHandler}
               placeholder="Type a message..."
               name="message"
               className="flex-1 p-2 rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white outline-none"
