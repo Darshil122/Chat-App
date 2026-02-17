@@ -31,6 +31,9 @@ This app allows multiple users to connect and exchange messages instantly throug
 - Express.js
 - Socket.IO
 
+### Database
+- MongoDB Atlas
+
 ### Deployment
 - Render
 
