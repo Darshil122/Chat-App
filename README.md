@@ -70,6 +70,7 @@ VITE_BACKEND_URL=http://localhost:8000
 
 ---
 
+### Start App
 - Run Frontend App
 ```bash
 npm run dev
